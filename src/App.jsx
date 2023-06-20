@@ -66,7 +66,7 @@ function App() {
       setIsLoading(true);
       const fetch = await axios.get(
         `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/${
-          queueType.charAt(0).toUpperCase() + queueType.slice(1) === "Agent"
+          queueType === "Agent"
             ? `Agent`
             : `Period?dateFrom=${dateFrom}&dateTo=${dateTo}`
         }`,
