@@ -14,20 +14,62 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+
+import { useBookStore } from "./bookStore.js";
 
 function App() {
-  const [dataStat, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [isError, setIsError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const {
+    companyId,
+    dateFrom,
+    dateTo,
+    dataStat,
+    isLoading,
+    isError,
+    errMsg,
+    queueType,
+  } = useBookStore((state) => ({
+    companyId: state.companyId,
+    dateFrom: state.dateFrom,
+    dateTo: state.dateTo,
+    dataStat: state.dataStat,
+    isLoading: state.isLoading,
+    isError: state.isError,
+    errMsg: state.errMsg,
+    queueType: state.queueType,
+  }));
 
-  const fetchData = async (dateFrom, dateTo) => {
+  const {
+    updateCompanyId: setCompanyId,
+    updateDateFrom: setDateFrom,
+    updateDateTo: setDateTo,
+    updateDataStat: setData,
+    updateIsLoading: setIsLoading,
+    updateIsError: setIsError,
+    updateErrMsg: setErrMsg,
+    updateQueueType,
+  } = useBookStore((state) => ({
+    updateCompanyId: state.updateCompanyId,
+    updateDateFrom: state.updateDateFrom,
+    updateDateTo: state.updateDateTo,
+    updateDataStat: state.updateDataStat,
+    updateIsLoading: state.updateIsLoading,
+    updateIsError: state.updateIsError,
+    updateErrMsg: state.updateErrMsg,
+    updateQueueType: state.updateQueueType,
+  }));
+
+  const fetchData = async (dateFrom, dateTo, companyId) => {
     try {
       setIsLoading(true);
       const fetch = await axios.get(
-        `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/Period?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+        `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/${
+          queueType.charAt(0).toUpperCase() + queueType.slice(1) === "Agent"
+            ? `Agent`
+            : `Period?dateFrom=${dateFrom}&dateTo=${dateTo}`
+        }`,
         {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
@@ -37,6 +79,7 @@ function App() {
       setIsLoading(false);
       const res = fetch.data;
       setData(res.data);
+      setIsError(false);
     } catch (error) {
       console.log(error);
       setIsLoading(false);
@@ -46,64 +89,79 @@ function App() {
   };
 
   const handleOnClick = () => {
-    fetchData(dateFrom, dateTo);
+    fetchData(dateFrom, dateTo, companyId);
   };
-
+  console.log(queueType);
   return (
     <Container sx={{ marginBottom: 2 }}>
       <Box display={"flex"} justifyContent={"center"}>
         <Box mt={2}>
           <FormControl sx={{ flexDirection: "row", margin: 1 }}>
-            {/* <FormLabel htmlFor="companyid" sx={{ marginRight: 1 }}>
-              Kundenummer
-            </FormLabel>
+            <InputLabel id="queueType">Køtype</InputLabel>
+            <Select
+              labelId="queueType"
+              id="queueType"
+              variant="filled"
+              size="small"
+              label="Kø"
+              value={queueType}
+              onChange={(e) => updateQueueType(e.target.value)}
+              sx={{ marginRight: 1, width: 150 }}
+            >
+              <MenuItem value={"Agent"}>Agent</MenuItem>
+              <MenuItem value={"Period"}>Period</MenuItem>
+            </Select>
             <TextField
               onChange={(e) => setCompanyId(e.target.value)}
               id="companyid"
+              type="number"
               variant="filled"
-              sx={{ marginRight: 1 }}
-            /> */}
-            <TextField
-              onChange={(e) => setDateFrom(e.target.value)}
-              id="datefrom"
               size="small"
-              variant="filled"
-              type="date"
-              label="Fra"
-              InputLabelProps={{
-                shrink: true,
-              }}
+              label="Kundenummer"
+              value={companyId}
+              // InputLabelProps={{
+              //   shrink: true,
+              // }}
               sx={{ marginRight: 1 }}
             />
-            <TextField
-              onChange={(e) => setDateTo(e.target.value)}
-              id="dateto"
-              variant="filled"
-              type="date"
-              label="Til"
-              size="small"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              sx={{ marginRight: 1 }}
-            />
+
+            {queueType.charAt(0).toUpperCase() + queueType.slice(1) ===
+            "Agent" ? (
+              ""
+            ) : (
+              <div>
+                <TextField
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  id="datefrom"
+                  size="small"
+                  variant="filled"
+                  type="date"
+                  label="Fra"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  sx={{ marginRight: 1 }}
+                />
+                <TextField
+                  onChange={(e) => setDateTo(e.target.value)}
+                  id="dateto"
+                  variant="filled"
+                  type="date"
+                  label="Til"
+                  size="small"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  sx={{ marginRight: 1 }}
+                />
+              </div>
+            )}
             <LoadingButton
               variant="contained"
               endIcon={<SendIcon />}
               loadingPosition="end"
               loading={isLoading}
               onClick={() => handleOnClick()}
-              disabled={
-                dateFrom === dateTo
-                  ? true
-                  : false || dateFrom > dateTo
-                  ? true
-                  : false || dateTo === ""
-                  ? true
-                  : false || dateFrom === ""
-                  ? true
-                  : false
-              }
             >
               Søg
             </LoadingButton>
@@ -140,13 +198,17 @@ function App() {
                   <TableCell>{item.queueName}</TableCell>
                   <TableCell>{item.calls}</TableCell>
                   <TableCell>
-                    {item.answeredCalls !== null
-                      ? item.answeredCalls
-                      : "Ingen data"}
+                    {item.answeredCalls !== null ? item.answeredCalls : "0"}
                   </TableCell>
-                  <TableCell>{item.averageCalltime}</TableCell>
-                  <TableCell>{item.averageHoldtime}</TableCell>
-                  <TableCell>{item.abandoned}</TableCell>
+                  <TableCell>
+                    {item.averageCalltime !== null ? item.averageCalltime : "0"}
+                  </TableCell>
+                  <TableCell>
+                    {item.averageHoldtime !== null ? item.averageHoldtime : "0"}
+                  </TableCell>
+                  <TableCell>
+                    {item.abandoned !== null ? item.abandoned : "0"}
+                  </TableCell>
                   <TableCell>
                     {item.serviceLevel}
                     {item.serviceLevel === null ? "" : "%"}
