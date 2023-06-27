@@ -16,5 +16,13 @@ export const useBookStore = create( (set, get) => ({
     errMsg: '',
     updateErrMsg: (newErrMsg) => set({errMsg: newErrMsg}),
     queueType: '',
-    updateQueueType: (newQueueType) => set({queueType: newQueueType})
+    updateQueueType: (newQueueType) => set({queueType: newQueueType}),
+    periodData: [],
+    updatePeriodData: (newPeriodData) => set({periodData: newPeriodData}),
+    agentData: [],
+    updateAgentData: (newAgentData) => set({agentData: newAgentData}),
+    queueNumber: "",
+    updateQueueNumber: (newQueueNumber) => set({queueNumber: newQueueNumber}),
+    selectedEndpoints: [],
+    updateSelectedEndpoints: (newSelectedEndpoint) => set({selectedEndpoints: newSelectedEndpoint})
 }));
