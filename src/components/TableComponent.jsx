@@ -30,7 +30,7 @@ const TableComponent = (props) => {
         </TableHead>
         <TableBody>
           {props.periodData
-
+            .filter((item) => item.queueExtension <= 1530)
             .sort((a, b) => b.calls - a.calls)
             .map((item, i) => (
               <TableRow key={i}>
@@ -39,7 +39,9 @@ const TableComponent = (props) => {
                 <TableCell>
                   {item.answeredCalls !== null ? item.answeredCalls : "0"}
                 </TableCell>
-                <TableCell>{item.transfers}</TableCell>
+                <TableCell>
+                  {item.transfers !== null ? item.transfers : 0}
+                </TableCell>
                 <TableCell>
                   {item.averageCalltime !== null
                     ? item.averageCalltime
