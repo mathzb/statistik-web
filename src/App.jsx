@@ -129,6 +129,16 @@ function App() {
     }, {})
   );
 
+  const handleDisableButton = () => {
+    if (dateFrom === "" || dateTo === "") {
+      return true;
+    } else if (dateFrom > dateTo) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+  console.log(handleDisableButton());
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -194,13 +204,8 @@ function App() {
                 loading={isLoading}
                 color="success"
                 size="medium"
-                disabled={
-                  dateTo < dateFrom
-                    ? true
-                    : false || dateFrom === ""
-                    ? true
-                    : false
-                }
+                disabled={handleDisableButton()}
+                sx={{ margin: 0.7 }}
               >
                 Søg
               </LoadingButton>
@@ -215,58 +220,68 @@ function App() {
           </Box>
         </Box>
         {periodData.length > 0 && (
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
-              <Grid item md={6}>
-                <Box margin={2}>Kø Statistik</Box>
-                <TableComponent
-                  periodData={periodData}
-                  caption={"Gælder kun ledsaget omstilling!"}
-                />
-              </Grid>
-              <Grid item md={6}>
-                <Box margin={2}>Agent Statistik</Box>
-                <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
-                  <Table stickyHeader>
-                    <caption>
-                      <strong>* Gælder kun for ledsaget omstilling!</strong>
-                    </caption>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Navn</TableCell>
-                        <TableCell>Besvaret</TableCell>
-                        {/* <TableCell>Gns. Samtaletid</TableCell> */}
-                        <Tooltip
-                          title="Gælder kun for ledsaget omstilling!"
-                          followCursor
-                        >
-                          <TableCell>Omstillet*</TableCell>
-                        </Tooltip>
-                        <TableCell>Behandlet</TableCell>
-                        <TableCell>DND</TableCell>
-                        <TableCell>Pause</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {result
+          <Box>
+            {/* <Grid item md={6}> */}
+            <Box
+              display={"flex"}
+              justifyContent={"space-evenly"}
+              marginTop={2}
+              marginBottom={1}
+              height={50}
+              component={Paper}
+              elevation={3}
+            >
+              <Box margin={1}>Kø Statistik</Box>
+            </Box>
+            <TableComponent
+              periodData={periodData}
+              caption={"Gælder kun ledsaget omstilling!"}
+            />
+            {/* </Grid> */}
+            <Grid item md={6}>
+              <Box margin={2}>Agent Statistik</Box>
+              <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
+                <Table stickyHeader>
+                  <caption>
+                    <strong>* Gælder kun for ledsaget omstilling!</strong>
+                  </caption>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Navn</TableCell>
+                      <TableCell>Besvaret</TableCell>
+                      {/* <TableCell>Gns. Samtaletid</TableCell> */}
+                      <Tooltip
+                        title="Gælder kun for ledsaget omstilling!"
+                        followCursor
+                      >
+                        <TableCell>Omstillet*</TableCell>
+                      </Tooltip>
+                      <TableCell>Behandlet</TableCell>
+                      <TableCell>DND</TableCell>
+                      <TableCell>Pause</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {result
 
-                        .sort((a, b) => b.calls - a.calls)
-                        .filter((item) => item.calls !== 0)
-                        .map((item, i) => (
-                          <TableRow key={i}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.calls}</TableCell>
-                            {/* <TableCell>{item.averageCalltime}</TableCell> */}
-                            <TableCell>{item.transfers}</TableCell>
-                            <TableCell>{item.calls - item.transfers}</TableCell>
-                            <TableCell>{item.dnd}</TableCell>
-                            <TableCell>{item.pause}</TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
+                      .sort((a, b) => b.calls - a.calls)
+                      .filter((item) => item.calls !== 0)
+                      .map((item, i) => (
+                        <TableRow key={i}>
+                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.calls}</TableCell>
+                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
+                          <TableCell>
+                            {item.transfers !== null ? item.transfers : 0}
+                          </TableCell>
+                          <TableCell>{item.calls - item.transfers}</TableCell>
+                          <TableCell>{item.dnd}</TableCell>
+                          <TableCell>{item.pause}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Grid>
           </Box>
         )}
