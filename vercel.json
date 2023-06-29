@@ -1,7 +1,7 @@
 {
     "headers": [
       {
-        "source": "/api.ipnordic.dk/(.*)",
+        "source": "https://api.ipnordic.dk/statistics/v1/(.*)",
         "headers": [
           { "key": "Access-Control-Allow-Credentials", "value": "true" },
           { "key": "Access-Control-Allow-Origin", "value": "*" },
