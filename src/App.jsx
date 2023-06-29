@@ -23,7 +23,8 @@ import _ from "lodash";
 import Tooltip from "@mui/material/Tooltip";
 
 import { useBookStore } from "./bookStore.js";
-import TableComponent from "./components/TableComponent.jsx";
+import PeriodTable from "./components/PeriodTable.jsx";
+import AgentTable from "./components/AgentTable.jsx";
 
 function App() {
   const {
@@ -91,11 +92,11 @@ function App() {
       try {
         setIsLoading(true);
         const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          `https://api.ipnordic.dk/statistics/v1/QueueReports/114327/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
         );
 
         const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          `https://api.ipnordic.dk/statistics/v1/QueueReports/114327/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
         );
 
         setIsLoading(false);
@@ -117,13 +118,22 @@ function App() {
 
   const result = Object.values(
     agentData.reduce((acc, obj) => {
-      const { name, calls, averageCalltime, dnd, pause, transfers } = obj;
+      const { name, calls, averageCalltime, dnd, pause, transfers, queueName } =
+        obj;
 
       if (acc[name]) {
         acc[name].calls += calls;
         acc[name].transfers += transfers;
       } else {
-        acc[name] = { name, calls, averageCalltime, dnd, pause, transfers };
+        acc[name] = {
+          name,
+          calls,
+          averageCalltime,
+          dnd,
+          pause,
+          transfers,
+          queueName,
+        };
       }
       return acc;
     }, {})
@@ -138,14 +148,36 @@ function App() {
       return false;
     }
   };
-  console.log(handleDisableButton());
+  // console.log(result);
+
+  const tableColumnsPeriod = [
+    "Kønavn",
+    "Opkald",
+    "Besvaret",
+    "Omstillet*",
+    "Antal Callback",
+    "Udløb",
+    "Lagt på",
+    "Gns. Samtaletid",
+    "Gns. Ventetid",
+    "Servicelevel",
+  ];
+
+  const tableColumnsAgent = [
+    "Navn",
+    "Besvaret",
+    "Omstillet*",
+    "Behandlet",
+    "DND",
+    "Pause",
+  ];
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
         <Box display={"flex"} justifyContent={"center"} marginBottom={0}>
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
-              <TextField
+              {/* <TextField
                 onChange={(e) => setCompanyId(e.target.value)}
                 id="companyid"
                 type="number"
@@ -155,7 +187,7 @@ function App() {
                 color="success"
                 value={companyId}
                 sx={{ marginRight: 1 }}
-              />
+              /> */}
 
               <TextField
                 onChange={(e) => setDateFrom(e.target.value)}
@@ -185,7 +217,7 @@ function App() {
                 }}
                 sx={{ marginRight: 1 }}
               />
-              <TextField
+              {/* <TextField
                 onChange={(e) => setQueueNumber(e.target.value)}
                 id="queueNumber"
                 type="number"
@@ -195,7 +227,7 @@ function App() {
                 color="success"
                 value={queueNumber}
                 sx={{ marginRight: 1 }}
-              />
+              /> */}
               <LoadingButton
                 type="submit"
                 variant="contained"
@@ -233,55 +265,19 @@ function App() {
             >
               <Box margin={1}>Kø Statistik</Box>
             </Box>
-            <TableComponent
+            <PeriodTable
               periodData={periodData}
               caption={"Gælder kun ledsaget omstilling!"}
+              columns={tableColumnsPeriod}
             />
             {/* </Grid> */}
             <Grid item md={6}>
               <Box margin={2}>Agent Statistik</Box>
-              <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
-                <Table stickyHeader>
-                  <caption>
-                    <strong>* Gælder kun for ledsaget omstilling!</strong>
-                  </caption>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Navn</TableCell>
-                      <TableCell>Besvaret</TableCell>
-                      {/* <TableCell>Gns. Samtaletid</TableCell> */}
-                      <Tooltip
-                        title="Gælder kun for ledsaget omstilling!"
-                        followCursor
-                      >
-                        <TableCell>Omstillet*</TableCell>
-                      </Tooltip>
-                      <TableCell>Behandlet</TableCell>
-                      <TableCell>DND</TableCell>
-                      <TableCell>Pause</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {result
-
-                      .sort((a, b) => b.calls - a.calls)
-                      .filter((item) => item.calls !== 0)
-                      .map((item, i) => (
-                        <TableRow key={i}>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.calls}</TableCell>
-                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
-                          <TableCell>
-                            {item.transfers !== null ? item.transfers : 0}
-                          </TableCell>
-                          <TableCell>{item.calls - item.transfers}</TableCell>
-                          <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause}</TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <AgentTable
+                agentData={agentData}
+                caption={"Gælder kun ledsaget omstilling!"}
+                columns={tableColumnsAgent}
+              />
             </Grid>
           </Box>
         )}
