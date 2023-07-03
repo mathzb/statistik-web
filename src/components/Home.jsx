@@ -39,11 +39,11 @@ function Home() {
             variant="contained"
             aria-label="outlined primary button group"
           >
-            <Button component={Link} to="/salg">
-              Salg
+            <Button component={Link} to="/support">
+              Support
             </Button>
-            <Button component={Link} to="/skade">
-              Skade
+            <Button component={Link} to="/opstart">
+              Opstart
             </Button>
           </ButtonGroup>
         </Box>
