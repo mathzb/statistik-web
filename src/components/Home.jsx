@@ -16,7 +16,7 @@ function Home() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
+    width: 550,
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
@@ -31,7 +31,7 @@ function Home() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography m={1} id="modal-modal-title" variant="h6" component="h2">
             Vælg afdeling
           </Typography>
 
@@ -44,6 +44,12 @@ function Home() {
             </Button>
             <Button component={Link} to="/opstart">
               Opstart
+            </Button>
+            <Button component={Link} to="/sekretærservice">
+              Sekretærservice
+            </Button>
+            <Button component={Link} to="/callcenter">
+              Callcenter
             </Button>
           </ButtonGroup>
         </Box>
