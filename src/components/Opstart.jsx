@@ -133,28 +133,28 @@ const Skade = () => {
       return false;
     }
   };
-  const result = Object.values(
-    agentData.reduce((acc, obj) => {
-      const { name, calls, averageCalltime, dnd, pause, transfers, queueName } =
-        obj;
+  // const result = Object.values(
+  //   agentData.reduce((acc, obj) => {
+  //     const { name, calls, averageCalltime, dnd, pause, transfers, queueName } =
+  //       obj;
 
-      if (acc[name]) {
-        acc[name].calls += calls;
-        acc[name].transfers += transfers;
-      } else {
-        acc[name] = {
-          name,
-          calls,
-          averageCalltime,
-          dnd,
-          pause,
-          transfers,
-          queueName,
-        };
-      }
-      return acc;
-    }, {})
-  );
+  //     if (acc[name]) {
+  //       acc[name].calls += calls;
+  //       acc[name].transfers += transfers;
+  //     } else {
+  //       acc[name] = {
+  //         name,
+  //         calls,
+  //         averageCalltime,
+  //         dnd,
+  //         pause,
+  //         transfers,
+  //         queueName,
+  //       };
+  //     }
+  //     return acc;
+  //   }, {})
+  // );
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -186,6 +186,12 @@ const Skade = () => {
             </MenuItem>
             <MenuItem component={Link} to={"/opstart"}>
               Opstart
+            </MenuItem>
+            <MenuItem component={Link} to={"/sekretærservice"}>
+              Sekretærservice
+            </MenuItem>
+            <MenuItem component={Link} to={"/sekretærservice"}>
+              Callcenter
             </MenuItem>
           </Menu>
 

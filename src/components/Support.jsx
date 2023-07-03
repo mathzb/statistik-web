@@ -196,6 +196,12 @@ const Support = () => {
             <MenuItem component={Link} to={"/opstart"}>
               Opstart
             </MenuItem>
+            <MenuItem component={Link} to={"/sekretærservice"}>
+              Sekretærservice
+            </MenuItem>
+            <MenuItem component={Link} to={"/sekretærservice"}>
+              Callcenter
+            </MenuItem>
           </Menu>
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
