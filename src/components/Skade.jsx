@@ -20,9 +20,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
-import { includes } from "lodash";
+import { calculateDND } from "../utils";
 
 const Skade = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -156,7 +155,7 @@ const Skade = () => {
       return acc;
     }, {})
   );
-  console.log(result);
+
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
