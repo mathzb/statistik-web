@@ -1,14 +1,14 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Sales from "./components/Sales.jsx";
+import Support from "./components/Support.jsx";
 import Home from "./components/Home.jsx";
-import Skade from "./components/Skade.jsx";
+import Opstart from "./components/Opstart.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/salg" element={<Sales />} />
-        <Route path="/skade" element={<Skade />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/opstart" element={<Opstart />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>
