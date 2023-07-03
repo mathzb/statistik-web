@@ -21,8 +21,9 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
+import { calculateDND } from "../utils";
 
-const Sales = () => {
+const Skade = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -36,6 +37,7 @@ const Sales = () => {
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
+    // hide last border
   }));
 
   const location = useLocation();
@@ -98,11 +100,11 @@ const Sales = () => {
       try {
         setIsLoading(true);
         const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/114327/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
         );
 
         const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/114327/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
         );
 
         setIsLoading(false);
@@ -179,13 +181,14 @@ const Sales = () => {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem component={Link} to={"/salg"}>
-              Salg
+            <MenuItem component={Link} to={"/support"}>
+              Support
             </MenuItem>
-            <MenuItem component={Link} to={"/skade"}>
-              Skade
+            <MenuItem component={Link} to={"/opstart"}>
+              Opstart
             </MenuItem>
           </Menu>
+
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
@@ -266,9 +269,7 @@ const Sales = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
-                    <Tooltip title="Antal tryk der har været ved callback">
-                      <TableCell>Antal Callback</TableCell>
-                    </Tooltip>
+                    <TableCell>Antal Callback</TableCell>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
@@ -278,13 +279,7 @@ const Sales = () => {
                 </TableHead>
                 <TableBody>
                   {periodData
-                    .filter(
-                      (item) =>
-                        item.queueExtension === 1511 ||
-                        item.queueExtension === 1500 ||
-                        (/S&R - Callback/.test(item.queueName) &&
-                          !/Skade/.test(item.queueName))
-                    )
+                    .filter((item) => item.queueExtension === 1530)
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
@@ -358,11 +353,9 @@ const Sales = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {result
+                    {agentData
 
-                      .filter((item) =>
-                        /Salg & Rådgivning/.test(item.queueName)
-                      )
+                      .filter((item) => item.queueName.includes("Opstart"))
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
@@ -388,4 +381,4 @@ const Sales = () => {
   );
 };
 
-export default Sales;
+export default Skade;

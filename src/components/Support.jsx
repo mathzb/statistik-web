@@ -21,9 +21,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateDND } from "../utils";
 
-const Skade = () => {
+const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -37,7 +36,6 @@ const Skade = () => {
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
-    // hide last border
   }));
 
   const location = useLocation();
@@ -100,11 +98,11 @@ const Skade = () => {
       try {
         setIsLoading(true);
         const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/114327/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
         );
 
         const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/114327/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
         );
 
         setIsLoading(false);
@@ -133,29 +131,40 @@ const Skade = () => {
       return false;
     }
   };
-  const result = Object.values(
-    agentData.reduce((acc, obj) => {
-      const { name, calls, averageCalltime, dnd, pause, transfers, queueName } =
-        obj;
+  // const result = Object.values(
+  //   agentData
+  //     // .filter((item) => item.queueName === "ipnordic Support")
+  //     .reduce((acc, obj) => {
+  //       const {
+  //         name,
+  //         calls,
+  //         averageCalltime,
+  //         dnd,
+  //         pause,
+  //         transfers,
+  //         queueName,
+  //       } = obj;
 
-      if (acc[name]) {
-        acc[name].calls += calls;
-        acc[name].transfers += transfers;
-      } else {
-        acc[name] = {
-          name,
-          calls,
-          averageCalltime,
-          dnd,
-          pause,
-          transfers,
-          queueName,
-        };
-      }
-      return acc;
-    }, {})
+  //       if (acc[name]) {
+  //         acc[name].calls += calls;
+  //         acc[name].transfers += transfers;
+  //       } else {
+  //         acc[name] = {
+  //           name,
+  //           calls,
+  //           averageCalltime,
+  //           dnd,
+  //           pause,
+  //           transfers,
+  //           queueName,
+  //         };
+  //       }
+  //       return acc;
+  //     }, {})
+  // );
+  console.log(
+    agentData.filter((item) => item.queueName.includes("ipnordic Support"))
   );
-
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -181,14 +190,13 @@ const Skade = () => {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem component={Link} to={"/salg"}>
-              Salg
+            <MenuItem component={Link} to={"/support"}>
+              Support
             </MenuItem>
-            <MenuItem component={Link} to={"/skade"}>
-              Skade
+            <MenuItem component={Link} to={"/opstart"}>
+              Opstart
             </MenuItem>
           </Menu>
-
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
@@ -269,7 +277,9 @@ const Skade = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
-                    <TableCell>Antal Callback</TableCell>
+                    <Tooltip title="Antal tryk der har været ved callback">
+                      <TableCell>Antal Callback</TableCell>
+                    </Tooltip>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
@@ -279,12 +289,7 @@ const Skade = () => {
                 </TableHead>
                 <TableBody>
                   {periodData
-                    .filter(
-                      (item) =>
-                        item.queueExtension <= 1505 ||
-                        (item.queueName.includes("Callback") &&
-                          !/S&R/.test(item.queueName))
-                    )
+                    .filter((item) => item.queueExtension === 1500)
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
@@ -358,12 +363,9 @@ const Skade = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {result
-
-                      .filter(
-                        (item) =>
-                          item.queueName.includes("Skade") ||
-                          item.queueName.includes("Indbo")
+                    {agentData
+                      .filter((item) =>
+                        item.queueName.includes("ipnordic Support")
                       )
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
@@ -390,4 +392,4 @@ const Skade = () => {
   );
 };
 
-export default Skade;
+export default Support;
