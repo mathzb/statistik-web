@@ -53,3 +53,36 @@ export function calculateDND(array) {
 
     return filteredArray;
   }
+
+  // Denne funktion vil tage arrayet med objects og summer alle "calls" og "transfers" og laver et nyt array med de nye data.
+  export const calculateCallsTransfers = (arr, dep) => Object.values(
+    arr
+      .filter((item) => item.queueName.includes(dep))
+      .reduce((acc, obj) => {
+        const {
+          name,
+          calls,
+          averageCalltime,
+          dnd,
+          pause,
+          transfers,
+          queueName,
+        } = obj;
+
+        if (acc[name]) {
+          acc[name].calls += calls;
+          acc[name].transfers += transfers;
+        } else {
+          acc[name] = {
+            name,
+            calls,
+            averageCalltime,
+            dnd,
+            pause,
+            transfers,
+            queueName,
+          };
+        }
+        return acc;
+      }, {})
+  );
