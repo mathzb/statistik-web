@@ -131,37 +131,37 @@ const Sekretærservice = () => {
       return false;
     }
   };
-  // const result = Object.values(
-  //   agentData
-  //     // .filter((item) => item.queueName === "ipnordic Support")
-  //     .reduce((acc, obj) => {
-  //       const {
-  //         name,
-  //         calls,
-  //         averageCalltime,
-  //         dnd,
-  //         pause,
-  //         transfers,
-  //         queueName,
-  //       } = obj;
+  const result = Object.values(
+    agentData
+      .filter((item) => item.queueName === "Sekretærservice")
+      .reduce((acc, obj) => {
+        const {
+          name,
+          calls,
+          averageCalltime,
+          dnd,
+          pause,
+          transfers,
+          queueName,
+        } = obj;
 
-  //       if (acc[name]) {
-  //         acc[name].calls += calls;
-  //         acc[name].transfers += transfers;
-  //       } else {
-  //         acc[name] = {
-  //           name,
-  //           calls,
-  //           averageCalltime,
-  //           dnd,
-  //           pause,
-  //           transfers,
-  //           queueName,
-  //         };
-  //       }
-  //       return acc;
-  //     }, {})
-  // );
+        if (acc[name]) {
+          acc[name].calls += calls;
+          acc[name].transfers += transfers;
+        } else {
+          acc[name] = {
+            name,
+            calls,
+            averageCalltime,
+            dnd,
+            pause,
+            transfers,
+            queueName,
+          };
+        }
+        return acc;
+      }, {})
+  );
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -361,10 +361,8 @@ const Sekretærservice = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {agentData
-                      .filter((item) =>
-                        item.queueName.includes("Sekretærservice")
-                      )
+                    {result
+
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>

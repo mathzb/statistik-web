@@ -131,40 +131,40 @@ const Support = () => {
       return false;
     }
   };
-  // const result = Object.values(
-  //   agentData
-  //     // .filter((item) => item.queueName === "ipnordic Support")
-  //     .reduce((acc, obj) => {
-  //       const {
-  //         name,
-  //         calls,
-  //         averageCalltime,
-  //         dnd,
-  //         pause,
-  //         transfers,
-  //         queueName,
-  //       } = obj;
+  const result = Object.values(
+    agentData
+      .filter((item) => item.queueName === "ipnordic Support")
+      .reduce((acc, obj) => {
+        const {
+          name,
+          calls,
+          averageCalltime,
+          dnd,
+          pause,
+          transfers,
+          queueName,
+        } = obj;
 
-  //       if (acc[name]) {
-  //         acc[name].calls += calls;
-  //         acc[name].transfers += transfers;
-  //       } else {
-  //         acc[name] = {
-  //           name,
-  //           calls,
-  //           averageCalltime,
-  //           dnd,
-  //           pause,
-  //           transfers,
-  //           queueName,
-  //         };
-  //       }
-  //       return acc;
-  //     }, {})
-  // );
-  console.log(
-    agentData.filter((item) => item.queueName.includes("ipnordic Support"))
+        if (acc[name]) {
+          acc[name].calls += calls;
+          acc[name].transfers += transfers;
+        } else {
+          acc[name] = {
+            name,
+            calls,
+            averageCalltime,
+            dnd,
+            pause,
+            transfers,
+            queueName,
+          };
+        }
+        return acc;
+      }, {})
   );
+  // console.log(
+  //   agentData.filter((item) => item.queueName.includes("ipnordic Support"))
+  // );
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -363,10 +363,10 @@ const Support = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {agentData
-                      .filter((item) =>
-                        item.queueName.includes("ipnordic Support")
-                      )
+                    {result
+                      // .filter((item) =>
+                      //   item.queueName.includes("ipnordic Support")
+                      // )
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>

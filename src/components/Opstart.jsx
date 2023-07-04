@@ -132,29 +132,38 @@ const Skade = () => {
       return false;
     }
   };
-  // const result = Object.values(
-  //   agentData.reduce((acc, obj) => {
-  //     const { name, calls, averageCalltime, dnd, pause, transfers, queueName } =
-  //       obj;
+  const result = Object.values(
+    agentData
+      .filter((item) => item.queueName.includes("Opstart"))
+      .reduce((acc, obj) => {
+        const {
+          name,
+          calls,
+          averageCalltime,
+          dnd,
+          pause,
+          transfers,
+          queueName,
+        } = obj;
 
-  //     if (acc[name]) {
-  //       acc[name].calls += calls;
-  //       acc[name].transfers += transfers;
-  //     } else {
-  //       acc[name] = {
-  //         name,
-  //         calls,
-  //         averageCalltime,
-  //         dnd,
-  //         pause,
-  //         transfers,
-  //         queueName,
-  //       };
-  //     }
-  //     return acc;
-  //   }, {})
-  // );
-  console.log(periodData);
+        if (acc[name]) {
+          acc[name].calls += calls;
+          acc[name].transfers += transfers;
+        } else {
+          acc[name] = {
+            name,
+            calls,
+            averageCalltime,
+            dnd,
+            pause,
+            transfers,
+            queueName,
+          };
+        }
+        return acc;
+      }, {})
+  );
+
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -365,9 +374,8 @@ const Skade = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {agentData
+                    {result
 
-                      .filter((item) => item.queueName.includes("Opstart"))
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
