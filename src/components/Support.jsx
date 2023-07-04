@@ -21,6 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
+import { calculateCallsTransfers } from "../utils";
 
 const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -94,7 +95,6 @@ const Support = () => {
       // Format the date to 'yyyy-mm-dd' format
       const formattedDate = inputDateObj.toISOString().split("T")[0];
 
-      console.log("API request with date:", formattedDate);
       try {
         setIsLoading(true);
         const fetchPeriod = await axios.get(
@@ -131,40 +131,7 @@ const Support = () => {
       return false;
     }
   };
-  const result = Object.values(
-    agentData
-      .filter((item) => item.queueName === "ipnordic Support")
-      .reduce((acc, obj) => {
-        const {
-          name,
-          calls,
-          averageCalltime,
-          dnd,
-          pause,
-          transfers,
-          queueName,
-        } = obj;
 
-        if (acc[name]) {
-          acc[name].calls += calls;
-          acc[name].transfers += transfers;
-        } else {
-          acc[name] = {
-            name,
-            calls,
-            averageCalltime,
-            dnd,
-            pause,
-            transfers,
-            queueName,
-          };
-        }
-        return acc;
-      }, {})
-  );
-  // console.log(
-  //   agentData.filter((item) => item.queueName.includes("ipnordic Support"))
-  // );
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -363,10 +330,7 @@ const Support = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {result
-                      // .filter((item) =>
-                      //   item.queueName.includes("ipnordic Support")
-                      // )
+                    {calculateCallsTransfers(agentData, "ipnordic Support")
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
