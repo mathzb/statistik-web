@@ -45,6 +45,9 @@ function Home() {
             <Button component={Link} to="/skade">
               Skade
             </Button>
+            <Button component={Link} to="/omstilling">
+              Omstilling
+            </Button>
           </ButtonGroup>
         </Box>
       </Modal>

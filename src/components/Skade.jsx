@@ -21,7 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateDND } from "../utils";
+import { calculateCallsTransfers } from "../utils";
 
 const Skade = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -37,7 +37,6 @@ const Skade = () => {
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,
     },
-    // hide last border
   }));
 
   const location = useLocation();
@@ -96,7 +95,6 @@ const Skade = () => {
       // Format the date to 'yyyy-mm-dd' format
       const formattedDate = inputDateObj.toISOString().split("T")[0];
 
-      console.log("API request with date:", formattedDate);
       try {
         setIsLoading(true);
         const fetchPeriod = await axios.get(
@@ -133,28 +131,6 @@ const Skade = () => {
       return false;
     }
   };
-  const result = Object.values(
-    agentData.reduce((acc, obj) => {
-      const { name, calls, averageCalltime, dnd, pause, transfers, queueName } =
-        obj;
-
-      if (acc[name]) {
-        acc[name].calls += calls;
-        acc[name].transfers += transfers;
-      } else {
-        acc[name] = {
-          name,
-          calls,
-          averageCalltime,
-          dnd,
-          pause,
-          transfers,
-          queueName,
-        };
-      }
-      return acc;
-    }, {})
-  );
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -182,13 +158,12 @@ const Skade = () => {
             }}
           >
             <MenuItem component={Link} to={"/salg"}>
-              Salg
+              Salg & Rådgivning
             </MenuItem>
             <MenuItem component={Link} to={"/skade"}>
               Skade
             </MenuItem>
           </Menu>
-
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
@@ -269,7 +244,6 @@ const Skade = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
-                    <TableCell>Antal Callback</TableCell>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
@@ -281,9 +255,16 @@ const Skade = () => {
                   {periodData
                     .filter(
                       (item) =>
-                        item.queueExtension <= 1505 ||
-                        (item.queueName.includes("Callback") &&
-                          !/S&R/.test(item.queueName))
+                        item.queueName.includes("Skade") ||
+                        item.queueName.includes("Hus - Callback Statistik") ||
+                        item.queueName.includes("Motor - Callback Statistik") ||
+                        item.queueName.includes(
+                          "Person - Callback Statistik"
+                        ) ||
+                        item.queueName.includes(
+                          "Indbo/Hund - Callback Statistik"
+                        ) ||
+                        item.queueName.includes("Andet - Callback Statistik")
                     )
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
@@ -297,9 +278,6 @@ const Skade = () => {
                         </TableCell>
                         <TableCell>
                           {item.transfers !== null ? item.transfers : 0}
-                        </TableCell>
-                        <TableCell>
-                          {item.exitWithKey !== null ? item.exitWithKey : 0}
                         </TableCell>
                         <TableCell>
                           {item.timeOut !== null ? item.timeOut : "0"}
@@ -358,13 +336,7 @@ const Skade = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {result
-
-                      .filter(
-                        (item) =>
-                          item.queueName.includes("Skade") ||
-                          item.queueName.includes("Indbo")
-                      )
+                    {calculateCallsTransfers(agentData, "Skade")
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
@@ -376,7 +348,9 @@ const Skade = () => {
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause}</TableCell>
+                          <TableCell>
+                            {item.pause !== null ? item.pause : "00:00:00"}
+                          </TableCell>
                         </StyledTableRow>
                       ))}
                   </TableBody>

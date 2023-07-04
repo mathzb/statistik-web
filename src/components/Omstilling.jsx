@@ -23,7 +23,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 import { calculateCallsTransfers } from "../utils";
 
-const Sales = () => {
+const Omstilling = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -163,6 +163,9 @@ const Sales = () => {
             <MenuItem component={Link} to={"/skade"}>
               Skade
             </MenuItem>
+            <MenuItem component={Link} to={"/omstilling"}>
+              Omstilling
+            </MenuItem>
           </Menu>
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
@@ -253,11 +256,7 @@ const Sales = () => {
                 </TableHead>
                 <TableBody>
                   {periodData
-                    .filter(
-                      (item) =>
-                        item.queueExtension === 1511 ||
-                        item.queueName.includes("S&R - Callback Statistik")
-                    )
+                    .filter((item) => item.queueExtension === 1500)
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
@@ -328,11 +327,7 @@ const Sales = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {calculateCallsTransfers(
-                      agentData,
-                      "Salg & Rådgivning",
-                      "S&R - Callback Statistik"
-                    )
+                    {calculateCallsTransfers(agentData, "Omstilling")
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
@@ -360,4 +355,4 @@ const Sales = () => {
   );
 };
 
-export default Sales;
+export default Omstilling;
