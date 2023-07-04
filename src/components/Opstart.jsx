@@ -21,7 +21,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateDND } from "../utils";
 
 const Skade = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -155,7 +154,7 @@ const Skade = () => {
   //     return acc;
   //   }, {})
   // );
-
+  console.log(periodData);
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -275,9 +274,10 @@ const Skade = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
-                    <TableCell>Antal Callback</TableCell>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
+                    <TableCell>Udløb ved 0. agenter</TableCell>
+                    <TableCell>Maks ventetid</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
                     <TableCell>Gns. Ventetid</TableCell>
                     <TableCell>Servicelevel</TableCell>
@@ -299,14 +299,20 @@ const Skade = () => {
                         <TableCell>
                           {item.transfers !== null ? item.transfers : 0}
                         </TableCell>
-                        <TableCell>
-                          {item.exitWithKey !== null ? item.exitWithKey : 0}
-                        </TableCell>
+
                         <TableCell>
                           {item.timeOut !== null ? item.timeOut : "0"}
                         </TableCell>
                         <TableCell>
                           {item.abandoned !== null ? item.abandoned : "0"}
+                        </TableCell>
+                        <TableCell>
+                          {item.exitempty !== null ? item.exitempty : "0"}
+                        </TableCell>
+                        <TableCell>
+                          {item.maxHoldtime !== null
+                            ? item.maxHoldtime
+                            : "00:00:00"}
                         </TableCell>
                         <TableCell>
                           {item.averageCalltime !== null
@@ -373,7 +379,9 @@ const Skade = () => {
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause}</TableCell>
+                          <TableCell>
+                            {item.pause !== null ? item.pause : "00:00:00"}
+                          </TableCell>
                         </StyledTableRow>
                       ))}
                   </TableBody>

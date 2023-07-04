@@ -283,9 +283,6 @@ const Support = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
-                    <Tooltip title="Antal tryk der har været ved callback">
-                      <TableCell>Antal Callback</TableCell>
-                    </Tooltip>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
@@ -308,9 +305,6 @@ const Support = () => {
                         </TableCell>
                         <TableCell>
                           {item.transfers !== null ? item.transfers : 0}
-                        </TableCell>
-                        <TableCell>
-                          {item.exitWithKey !== null ? item.exitWithKey : 0}
                         </TableCell>
                         <TableCell>
                           {item.timeOut !== null ? item.timeOut : "0"}
@@ -384,7 +378,9 @@ const Support = () => {
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause}</TableCell>
+                          <TableCell>
+                            {item.pause !== null ? item.pause : "00:00:00"}
+                          </TableCell>
                         </StyledTableRow>
                       ))}
                   </TableBody>

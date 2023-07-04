@@ -281,9 +281,6 @@ const Callcenter = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
-                    <Tooltip title="Antal tryk der har været ved callback">
-                      <TableCell>Antal Callback</TableCell>
-                    </Tooltip>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
@@ -307,9 +304,7 @@ const Callcenter = () => {
                         <TableCell>
                           {item.transfers !== null ? item.transfers : 0}
                         </TableCell>
-                        <TableCell>
-                          {item.exitWithKey !== null ? item.exitWithKey : 0}
-                        </TableCell>
+
                         <TableCell>
                           {item.timeOut !== null ? item.timeOut : "0"}
                         </TableCell>
