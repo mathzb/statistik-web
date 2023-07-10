@@ -16,7 +16,7 @@ function Home() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 550,
+    width: 700,
     bgcolor: "background.paper",
     border: "2px solid #000",
     boxShadow: 24,
@@ -44,6 +44,9 @@ function Home() {
             </Button>
             <Button component={Link} to="/opstart">
               Opstart
+            </Button>
+            <Button component={Link} to="/whitelabels">
+              Whitelabels
             </Button>
             <Button component={Link} to="/sekretærservice">
               Sekretærservice
