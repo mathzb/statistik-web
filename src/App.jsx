@@ -4,6 +4,7 @@ import Home from "./components/Home.jsx";
 import Opstart from "./components/Opstart.jsx";
 import Sekretærservice from "./components/Sekretærservice.jsx";
 import Callcenter from "./components/Callcenter.jsx";
+import Whitelabels from "./components/Whitelabels.jsx";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/opstart" element={<Opstart />} />
         <Route path="/sekretærservice" element={<Sekretærservice />} />
         <Route path="/callcenter" element={<Callcenter />} />
+        <Route path="/whitelabels" element={<Whitelabels />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>
