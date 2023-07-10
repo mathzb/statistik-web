@@ -55,9 +55,9 @@ export function calculateDND(array) {
   }
 
   // Denne funktion vil tage arrayet med objects og summer alle "calls" og "transfers" og laver et nyt array med de nye data.
-  export const calculateCallsTransfers = (arr, dep) => Object.values(
+  export const calculateCallsTransfers = (arr, dep1 = null, dep2 = null, dep3 = null, dep4 = null, dep5 = null) => Object.values(
     arr
-      .filter((item) => item.queueName.includes(dep))
+      .filter((item) => item.queueName.includes(dep1) || item.queueName.includes(dep2) || item.queueName.includes(dep3) || item.queueName.includes(dep4) || item.queueName.includes(dep5))
       .reduce((acc, obj) => {
         const {
           name,
