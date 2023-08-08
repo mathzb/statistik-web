@@ -86,3 +86,16 @@ export const calculateCallsTransfers = (arr, dep1, dep2 = null) => Object.values
       return acc;
     }, {})
 );
+
+export const reduceQueueName = arr => Object.values(
+ arr.reduce((acc, current) => {
+  const existingItem = acc.find(item => item.queueName === current.queueName)
+
+  if (!existingItem) {
+    acc.push(current)
+   }
+
+   return acc
+ }, [])
+ 
+)
