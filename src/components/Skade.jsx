@@ -21,7 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfers } from "../utils";
+import { calculateCallsTransfers, reduceQueueName } from "../utils";
 
 const Skade = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
