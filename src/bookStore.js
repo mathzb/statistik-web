@@ -24,5 +24,9 @@ export const useBookStore = create( (set, get) => ({
     queueNumber: "",
     updateQueueNumber: (newQueueNumber) => set({queueNumber: newQueueNumber}),
     selectedEndpoints: [],
-    updateSelectedEndpoints: (newSelectedEndpoint) => set({selectedEndpoints: newSelectedEndpoint})
+    updateSelectedEndpoints: (newSelectedEndpoint) => set({selectedEndpoints: newSelectedEndpoint}),
+    username: "",
+    updateUsername: (newUserName) => set({username: newUserName}),
+    password: "",
+    updatePassword: (newPassword) => set({password: newPassword})
 }));
