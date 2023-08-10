@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "ipnordic-c1596"
-  }
+    "default": "ipnordic-c1596",
+    "prod": "ipnordic-c1596"
+  },
+  "targets": {},
+  "etags": {}
 }
