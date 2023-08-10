@@ -163,6 +163,9 @@ const Skade = () => {
             <MenuItem component={Link} to={"/skade"}>
               Skade
             </MenuItem>
+            <MenuItem component={Link} to={"/omstilling"}>
+              Omstilling
+            </MenuItem>
           </Menu>
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
@@ -244,6 +247,84 @@ const Skade = () => {
                     <Tooltip title="Gælder kun ved ledsaget omstilling!">
                       <TableCell>Omstillet*</TableCell>
                     </Tooltip>
+                    <TableCell>Callback</TableCell>
+                    <TableCell>Udløb</TableCell>
+                    <TableCell>Lagt på</TableCell>
+                    <TableCell>Gns. Samtaletid</TableCell>
+                    <TableCell>Gns. Ventetid</TableCell>
+                    <TableCell>Servicelevel</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {periodData
+                    .filter((item) => item.queueName.includes("Skade"))
+                    .sort((a, b) => b.calls - a.calls)
+                    .map((item, i) => (
+                      <StyledTableRow key={i}>
+                        <TableCell>{item.queueName}</TableCell>
+                        <TableCell>{item.calls}</TableCell>
+                        <TableCell>
+                          {item.answeredCalls !== null
+                            ? item.answeredCalls
+                            : "0"}
+                        </TableCell>
+                        <TableCell>
+                          {item.transfers !== null ? item.transfers : 0}
+                        </TableCell>
+                        <TableCell>
+                          {item.exitWithKey !== null ? item.exitWithKey : "0"}
+                        </TableCell>
+                        <TableCell>
+                          {item.timeOut !== null ? item.timeOut : "0"}
+                        </TableCell>
+                        <TableCell>
+                          {item.abandoned !== null ? item.abandoned : "0"}
+                        </TableCell>
+                        <TableCell>
+                          {item.averageCalltime !== null
+                            ? item.averageCalltime
+                            : "00:00:00"}
+                        </TableCell>
+                        <TableCell>
+                          {item.averageHoldtime !== null
+                            ? item.averageHoldtime
+                            : "00:00:00"}
+                        </TableCell>
+
+                        <TableCell>
+                          {item.serviceLevel}
+                          {item.serviceLevel === null ? "0%" : "%"}
+                        </TableCell>
+                      </StyledTableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Box
+              display={"flex"}
+              justifyContent={"space-evenly"}
+              marginTop={2}
+              marginBottom={2}
+              height={50}
+              component={Paper}
+              elevation={3}
+            >
+              <Box margin={1.5}>Callback Statistik - {capitalizedPath}</Box>
+            </Box>
+            <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
+              <Table stickyHeader>
+                <caption>
+                  <strong>Gælder kun ledsaget omstilling!</strong>
+                </caption>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Kønavn</TableCell>
+                    <TableCell>Opkald</TableCell>
+                    <TableCell>Besvaret</TableCell>
+                    <Tooltip title="Gælder kun ved ledsaget omstilling!">
+                      <TableCell>Omstillet*</TableCell>
+                    </Tooltip>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
@@ -255,7 +336,6 @@ const Skade = () => {
                   {periodData
                     .filter(
                       (item) =>
-                        item.queueName.includes("Skade") ||
                         item.queueName.includes("Hus - Callback Statistik") ||
                         item.queueName.includes("Motor - Callback Statistik") ||
                         item.queueName.includes(
@@ -305,6 +385,7 @@ const Skade = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+
             {/* </Grid> */}
             <Grid item md={6}>
               <Box
