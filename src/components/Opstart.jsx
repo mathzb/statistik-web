@@ -166,6 +166,9 @@ const Skade = () => {
               Opstart
             </MenuItem>
             <MenuItem component={Link} to={"/sekretærservice"}>
+              Whitelabels
+            </MenuItem>
+            <MenuItem component={Link} to={"/sekretærservice"}>
               Sekretærservice
             </MenuItem>
             <MenuItem component={Link} to={"/sekretærservice"}>

@@ -164,9 +164,12 @@ const Sekretærservice = () => {
               Opstart
             </MenuItem>
             <MenuItem component={Link} to={"/sekretærservice"}>
+              Whitelabels
+            </MenuItem>
+            <MenuItem component={Link} to={"/sekretærservice"}>
               Sekretærservice
             </MenuItem>
-            <MenuItem component={Link} to={"/callcenter"}>
+            <MenuItem component={Link} to={"/sekretærservice"}>
               Callcenter
             </MenuItem>
           </Menu>
