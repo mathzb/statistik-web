@@ -86,3 +86,18 @@ export function calculateDND(array) {
         return acc;
       }, {})
   );
+
+  export function checkDateDifference(dateFrom, dateTo) {
+    const twoYearsInMillis = 2 * 365 * 24 * 60 * 60 * 1000; // Two years in milliseconds
+    
+    const fromDate = new Date(dateFrom);
+    const toDate = new Date(dateTo);
+    
+    const dateDifference = Math.abs(toDate - fromDate);
+    
+    if (dateDifference > twoYearsInMillis) {
+      return "It is not allowed to select a date range of more than 2 years.";
+    } else {
+      return "Date range is within 2 years.";
+    }
+  }

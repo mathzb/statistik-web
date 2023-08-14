@@ -163,13 +163,13 @@ const Callcenter = () => {
             <MenuItem component={Link} to={"/opstart"}>
               Opstart
             </MenuItem>
-            <MenuItem component={Link} to={"/sekretærservice"}>
+            <MenuItem component={Link} to={"/whitelabels"}>
               Whitelabels
             </MenuItem>
             <MenuItem component={Link} to={"/sekretærservice"}>
               Sekretærservice
             </MenuItem>
-            <MenuItem component={Link} to={"/sekretærservice"}>
+            <MenuItem component={Link} to={"/callcenter"}>
               Callcenter
             </MenuItem>
           </Menu>
@@ -217,15 +217,17 @@ const Callcenter = () => {
                 Søg
               </LoadingButton>
             </form>
-            {isError ? (
-              <Alert severity="error" sx={{ margin: 2 }}>
-                {errMsg}
-              </Alert>
-            ) : (
-              ""
-            )}
           </Box>
         </Box>
+        {isError ? (
+          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
+            <Alert severity="error" sx={{ margin: 2 }}>
+              {errMsg}
+            </Alert>
+          </Box>
+        ) : (
+          ""
+        )}
         {periodData.length > 0 && (
           <Box>
             {/* <Grid item md={6}> */}
