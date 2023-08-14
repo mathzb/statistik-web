@@ -7,6 +7,7 @@ import Callcenter from "./components/Callcenter.jsx";
 import Whitelabels from "./components/Whitelabels.jsx";
 
 function App() {
+  console.log('Ny version')
   return (
     <Router>
       <Routes>
