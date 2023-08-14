@@ -21,7 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfers } from "../utils";
+import { calculateCallsTransfers, checkDateDifference } from "../utils";
 
 const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -127,8 +127,10 @@ const Support = () => {
       return true;
     } else if (dateFrom > dateTo) {
       return true;
+    } else if (checkDateDifference(dateFrom, dateTo)) {
+      return true;
     } else {
-      return false;
+      return false
     }
   };
 
@@ -219,6 +221,13 @@ const Support = () => {
             </form>
           </Box>
         </Box>
+        {checkDateDifference(dateFrom, dateTo) ? (
+          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
+          <Alert severity="error" sx={{ margin: 2 }}>
+          It is not allowed to select a date range of more than 2 years.
+          </Alert>
+        </Box>
+        ) : ''}
         {isError ? (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
             <Alert severity="error" sx={{ margin: 2 }}>

@@ -96,8 +96,8 @@ export function calculateDND(array) {
     const dateDifference = Math.abs(toDate - fromDate);
     
     if (dateDifference > twoYearsInMillis) {
-      return "It is not allowed to select a date range of more than 2 years.";
+      return true
     } else {
-      return "Date range is within 2 years.";
+      return false
     }
   }
