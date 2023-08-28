@@ -224,7 +224,7 @@ const Support = () => {
         {checkDateDifference(dateFrom, dateTo) ? (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
           <Alert severity="error" sx={{ margin: 2 }}>
-          It is not allowed to select a date range of more than 2 years.
+          Det er ikke tilladt at vælge en dato på mere end 2 år.
           </Alert>
         </Box>
         ) : ''}
