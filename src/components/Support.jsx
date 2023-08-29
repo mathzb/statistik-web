@@ -134,11 +134,6 @@ const Support = () => {
     }
   };
 
-
-  const test = calculateCallsTransfersAndPause(agentData, "ipnordic Support")
-
-  console.log(test)
-
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
