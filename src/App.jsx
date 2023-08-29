@@ -5,6 +5,7 @@ import Opstart from "./components/Opstart.jsx";
 import Sekretærservice from "./components/Sekretærservice.jsx";
 import Callcenter from "./components/Callcenter.jsx";
 import Whitelabels from "./components/Whitelabels.jsx";
+import Enreach from "./components/Enreach.jsx";
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/support" element={<Support />} />
         <Route path="/opstart" element={<Opstart />} />
+        <Route path="/enreach" element={<Enreach />} />
         <Route path="/sekretærservice" element={<Sekretærservice />} />
         <Route path="/callcenter" element={<Callcenter />} />
         <Route path="/whitelabels" element={<Whitelabels />} />

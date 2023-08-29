@@ -23,7 +23,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 import { calculateCallsTransfersAndPause } from "../utils";
 
-const Callcenter = () => {
+const Enreach = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -267,7 +267,11 @@ const Callcenter = () => {
                 </TableHead>
                 <TableBody>
                   {periodData
-                    .filter((item) => item.queueName.includes("CC"))
+                    .filter(
+                      (item) =>
+                        item.queueExtension === 1501 ||
+                        item.queueExtension === 1506
+                          )
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
@@ -281,7 +285,6 @@ const Callcenter = () => {
                         <TableCell>
                           {item.transfers !== null ? item.transfers : 0}
                         </TableCell>
-
                         <TableCell>
                           {item.timeOut !== null ? item.timeOut : "0"}
                         </TableCell>
@@ -339,7 +342,11 @@ const Callcenter = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {calculateCallsTransfersAndPause(agentData, "CC")
+                    {calculateCallsTransfersAndPause(
+                      agentData,
+                      "Enreach Kundeservice",
+                      "Enreach"
+                    )
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
@@ -351,7 +358,9 @@ const Callcenter = () => {
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause}</TableCell>
+                          <TableCell>
+                            {item.pause !== null ? item.pause : "00:00:00"}
+                          </TableCell>
                         </StyledTableRow>
                       ))}
                   </TableBody>
@@ -365,4 +374,4 @@ const Callcenter = () => {
   );
 };
 
-export default Callcenter;
+export default Enreach;
