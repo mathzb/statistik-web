@@ -54,8 +54,23 @@ export function calculateDND(array) {
     return filteredArray;
   }
 
-  // Denne funktion vil tage arrayet med objects og summer alle "calls" og "transfers" og laver et nyt array med de nye data.
-  export const calculateCallsTransfers = (arr, dep1 = null, dep2 = null, dep3 = null, dep4 = null, dep5 = null) => Object.values(
+// Helper function to convert HH:mm:ss formatted time to seconds
+const timeToSeconds = (time) => {
+  const [hours, minutes, seconds] = time.split(":").map(Number);
+  return hours * 3600 + minutes * 60 + seconds;
+};
+
+// Helper function to convert seconds to HH:mm:ss format
+const secondsToTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+};
+
+export const calculateCallsTransfersAndPause = (arr, dep1 = null, dep2 = null, dep3 = null, dep4 = null, dep5 = null) => {
+  const result = Object.values(
     arr
       .filter((item) => item.queueName.includes(dep1) || item.queueName.includes(dep2) || item.queueName.includes(dep3) || item.queueName.includes(dep4) || item.queueName.includes(dep5))
       .reduce((acc, obj) => {
@@ -69,16 +84,24 @@ export function calculateDND(array) {
           queueName,
         } = obj;
 
+        const pauseInSeconds = pause ? pause.split(",").reduce((total, time) => total + timeToSeconds(time), 0) : 0;
+        const formattedPauseTime = secondsToTime(pauseInSeconds);
+
+        const dndInSeconds = dnd ? dnd.split(",").reduce((total, time) => total + timeToSeconds(time), 0) : 0;
+        const formattedDndTime = secondsToTime(dndInSeconds)
+
         if (acc[name]) {
           acc[name].calls += calls;
           acc[name].transfers += transfers;
+          acc[name].pause = formattedPauseTime;
+          acc[name].dnd = formattedDndTime
         } else {
           acc[name] = {
             name,
             calls,
             averageCalltime,
-            dnd,
-            pause,
+            dnd: formattedDndTime,
+            pause: formattedPauseTime,
             transfers,
             queueName,
           };
@@ -86,6 +109,12 @@ export function calculateDND(array) {
         return acc;
       }, {})
   );
+
+  return result;
+};
+
+  
+  
 
   export function checkDateDifference(dateFrom, dateTo) {
     const twoYearsInMillis = 2 * 365 * 24 * 60 * 60 * 1000; // Two years in milliseconds

@@ -21,7 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfers } from "../utils";
+import { calculateCallsTransfersAndPause } from "../utils";
 
 const Sekretærservice = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -335,7 +335,7 @@ const Sekretærservice = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {calculateCallsTransfers(agentData, "Sekretærservice")
+                    {calculateCallsTransfersAndPause(agentData, "Sekretærservice")
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>

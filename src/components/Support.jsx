@@ -21,7 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfers, checkDateDifference } from "../utils";
+import { calculateCallsTransfersAndPause, checkDateDifference } from "../utils";
 
 const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -133,6 +133,11 @@ const Support = () => {
       return false
     }
   };
+
+
+  const test = calculateCallsTransfersAndPause(agentData, "ipnordic Support")
+
+  console.log(test)
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -344,7 +349,7 @@ const Support = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {calculateCallsTransfers(agentData, "ipnordic Support")
+                    {calculateCallsTransfersAndPause(agentData, "ipnordic Support")
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>

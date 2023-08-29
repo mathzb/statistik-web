@@ -21,7 +21,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfers } from "../utils";
+import { calculateCallsTransfersAndPause } from "../utils";
 
 const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -344,7 +344,7 @@ const Support = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {calculateCallsTransfers(
+                    {calculateCallsTransfersAndPause(
                       agentData,
                       "Norlys",
                       "Protel",
