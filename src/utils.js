@@ -1,82 +1,133 @@
-// Helper function to convert HH:mm:ss formatted time to seconds
-const timeToSeconds = (time) => {
-  const [hours, minutes, seconds] = time.split(":").map(Number);
-  return hours * 3600 + minutes * 60 + seconds;
-};
-
-// Helper function to convert seconds to HH:mm:ss format
-const secondsToTime = (seconds) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-};
-
-export const calculateCallsTransfersAndPause = (arr, ...dependencies) => {
+export function calculateCallsTransfersAndPause(inputData, ...dependencies) {
   const dependencySet = new Set(dependencies);
 
-  const calculateTime = (timeString) => {
-    if (!timeString) return "00:00:00";
-    const totalSeconds = timeString
-      .split(",")
-      .reduce((total, time) => total + timeToSeconds(time), 0);
-    return secondsToTime(totalSeconds);
-  };
+  return inputData.reduce((result, currentItem) => {
+    const { name, calls, transfers, pause, dnd, queueName, ...rest } =
+      currentItem;
 
-  const result = Object.values(
-    arr.reduce((acc, obj) => {
-      const {
+    if (!dependencySet.has(queueName)) {
+      return result;
+    }
+
+    const existingEntry = result.find((entry) => entry.name === name);
+
+    if (existingEntry) {
+      existingEntry.calls += calls;
+      existingEntry.transfers += transfers;
+
+      if (pause) {
+        const pauseInSeconds = pause.split(":").reduce((acc, val, index) => {
+          return (
+            acc + parseInt(val) * (index === 0 ? 3600 : index === 1 ? 60 : 1)
+          );
+        }, 0);
+
+        const totalPauseInSeconds = existingEntry.pause
+          .split(":")
+          .reduce((acc, val, index) => {
+            return (
+              acc + parseInt(val) * (index === 0 ? 3600 : index === 1 ? 60 : 1)
+            );
+          }, 0);
+
+        const totalPause = totalPauseInSeconds + pauseInSeconds;
+
+        const hours = Math.floor(totalPause / 3600);
+        const minutes = Math.floor((totalPause % 3600) / 60);
+        const secondsLeft = totalPause % 60;
+        // existingEntry.pause = formatTime(totalPause);
+        existingEntry.pause = `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${secondsLeft.toString().padStart(2, "0")}`;
+      }
+
+      if (dnd) {
+        const dndInSeconds = dnd.split(":").reduce((acc, val, index) => {
+          return (
+            acc + parseInt(val) * (index === 0 ? 3600 : index === 1 ? 60 : 1)
+          );
+        }, 0);
+
+        const totalDndInSeconds = existingEntry.dnd
+          .split(":")
+          .reduce((acc, val, index) => {
+            return (
+              acc + parseInt(val) * (index === 0 ? 3600 : index === 1 ? 60 : 1)
+            );
+          }, 0);
+
+        const totalDnd = totalDndInSeconds + dndInSeconds;
+
+        const hours = Math.floor(totalDnd / 3600);
+        const minutes = Math.floor((totalDnd % 3600) / 60);
+        const secondsLeft = totalDnd % 60;
+        // existingEntry.dnd = formatTime(totalDnd);
+        existingEntry.dnd = `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${secondsLeft.toString().padStart(2, "0")}`;
+      }
+    } else {
+      const newEntry = {
         name,
         calls,
-        averageCalltime,
-        dnd,
-        pause,
         transfers,
-        queueName,
-      } = obj;
+        pause: "00:00:00",
+        dnd: "00:00:00",
+        ...rest,
+      };
+      if (pause) {
+        const pauseInSeconds = pause.split(":").reduce((acc, val, index) => {
+          return (
+            acc + parseInt(val) * (index === 0 ? 3600 : index === 1 ? 60 : 1)
+          );
+        }, 0);
 
-      if (!dependencySet.has(queueName)) {
-        return acc;
+        const hours = Math.floor(pauseInSeconds / 3600);
+        const minutes = Math.floor((pauseInSeconds % 3600) / 60);
+        const secondsLeft = pauseInSeconds % 60;
+        // newEntry.pause = formatTime(pauseInSeconds);
+        newEntry.pause = `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${secondsLeft.toString().padStart(2, "0")}`;
       }
 
-      const formattedPauseTime = calculateTime(pause);
-      const formattedDndTime = calculateTime(dnd);
+      if (dnd) {
+        const dndInSeconds = dnd.split(":").reduce((acc, val, index) => {
+          return (
+            acc + parseInt(val) * (index === 0 ? 3600 : index === 1 ? 60 : 1)
+          );
+        }, 0);
 
-      if (acc[name]) {
-        acc[name].calls += calls;
-        acc[name].transfers += transfers;
-        acc[name].pause = formattedPauseTime;
-        acc[name].dnd = formattedDndTime;
-      } else {
-        acc[name] = {
-          name,
-          calls,
-          averageCalltime,
-          dnd: formattedDndTime,
-          pause: formattedPauseTime,
-          transfers,
-          queueName,
-        };
+        const hours = Math.floor(dndInSeconds / 3600);
+        const minutes = Math.floor((dndInSeconds % 3600) / 60);
+        const secondsLeft = dndInSeconds % 60;
+        // newEntry.dnd = formatTime(dndInSeconds);
+        newEntry.dnd = `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${secondsLeft.toString().padStart(2, "0")}`;
       }
-      return acc;
-    }, {})
-  );
-
-  return result;
-};
-
-  export function checkDateDifference(dateFrom, dateTo) {
-    const twoYearsInMillis = 2 * 365 * 24 * 60 * 60 * 1000; // Two years in milliseconds
-    
-    const fromDate = new Date(dateFrom);
-    const toDate = new Date(dateTo);
-    
-    const dateDifference = Math.abs(toDate - fromDate);
-    
-    if (dateDifference > twoYearsInMillis) {
-      return true
-    } else {
-      return false
+      result.push(newEntry);
     }
+
+    return result;
+  }, []);
+}
+
+export function checkDateDifference(dateFrom, dateTo) {
+  // Calculate the number of milliseconds in two years
+  const twoYearsInMillis = 2 * 365 * 24 * 60 * 60 * 1000;
+
+  // Convert the input date strings into JavaScript Date objects
+  const fromDate = new Date(dateFrom);
+  const toDate = new Date(dateTo);
+
+  // Calculate the absolute difference in milliseconds between the two dates
+  const dateDifference = Math.abs(toDate - fromDate);
+
+  // Compare the calculated difference with the two years threshold
+  if (dateDifference > twoYearsInMillis) {
+    return true; // If the difference is greater than two years, return true
+  } else {
+    return false; // Otherwise, return false
   }
+}
