@@ -1,11 +1,19 @@
 export function calculateCallsTransfersAndPause(inputData, ...dependencies) {
   const dependencySet = new Set(dependencies);
 
+  // Iterate through dependencies and add them to the set
+  dependencySet.add(...dependencies);
+
   return inputData.reduce((result, currentItem) => {
     const { name, calls, transfers, pause, dnd, queueName, ...rest } =
       currentItem;
 
-    if (!dependencySet.has(queueName)) {
+    // Check if any of the dependencies are found in the queueName
+    const hasMatchingDependency = dependencies.some((dep) =>
+      queueName.includes(dep)
+    );
+
+    if (!hasMatchingDependency) {
       return result;
     }
 
