@@ -7,11 +7,8 @@ import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Grid from "@mui/material/Grid";
 import { useBookStore } from "../bookStore";
-import Button from "@mui/material/Button";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -22,6 +19,7 @@ import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
 import { calculateCallsTransfersAndPause } from "../utils";
+import Navbar from "./Navbar";
 
 const Callcenter = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -137,45 +135,13 @@ const Callcenter = () => {
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
         <Box display={"flex"} justifyContent={"space-between"} marginBottom={2}>
           <Box margin={2} paddingTop={2}>
-            <Button
-              variant="outlined"
-              id="basic-button"
-              aria-controls={open ? "basic-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-              onClick={handleClick}
-            >
-              Vælg Afdeling
-            </Button>
+          <Navbar
+              anchorEl={anchorEl}
+              open={open}
+              handleClick={handleClick}
+              handleClose={handleClose}
+            />
           </Box>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              "aria-labelledby": "basic-button",
-            }}
-          >
-            <MenuItem component={Link} to={"/support"}>
-              Support
-            </MenuItem>
-            <MenuItem component={Link} to={"/opstart"}>
-              Opstart
-            </MenuItem>
-            <MenuItem component={Link} to={"/enreach"}>
-              Enreach
-            </MenuItem>
-            <MenuItem component={Link} to={"/whitelabels"}>
-              Whitelabels
-            </MenuItem>
-            <MenuItem component={Link} to={"/sekretærservice"}>
-              Sekretærservice
-            </MenuItem>
-            <MenuItem component={Link} to={"/callcenter"}>
-              Callcenter
-            </MenuItem>
-          </Menu>
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
