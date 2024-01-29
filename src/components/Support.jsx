@@ -137,12 +137,12 @@ const Support = () => {
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
         <Box display={"flex"} justifyContent={"space-between"} marginBottom={2}>
           <Box margin={2} paddingTop={2}>
-          {/* <Navbar
+          <Navbar
               anchorEl={anchorEl}
               open={open}
               handleClick={handleClick}
               handleClose={handleClose}
-            /> */}
+            />
           </Box>
           
           <Box mt={2}>
