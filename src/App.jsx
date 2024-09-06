@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import axios, { all } from "axios";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -80,34 +80,27 @@ function App() {
     };
 
     if (dateTo) {
-      // Add one day to the input date
       const inputDateObj = new Date(dateTo);
       inputDateObj.setDate(inputDateObj.getDate() + 1);
-
-      // Format the date to 'yyyy-mm-dd' format
       const formattedDate = inputDateObj.toISOString().split("T")[0];
 
-      console.log("API request with date:", formattedDate);
       try {
         setIsLoading(true);
-        const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
 
-        const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
+        const [fetchPeriod, fetchAgent] = await Promise.all([
+          axios.get(
+            `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          ),
+          axios.get(
+            `https://api.ipnordic.dk/statistics/v1/QueueReports/${companyId}/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
+          ),
+        ]);
 
         setIsLoading(false);
-        const resPeriod = fetchPeriod.data;
-        const resAgent = fetchAgent.data;
-        setPeriodData(resPeriod.data);
-        setAgentData(resAgent.data);
+        setPeriodData(fetchPeriod.data.data);
+        setAgentData(fetchAgent.data.data);
         setIsError(false);
-        // console.log(resAgent.data);
-        // console.log(resPeriod.data);
       } catch (error) {
-        console.log(error);
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
@@ -115,87 +108,78 @@ function App() {
     }
   };
 
-  const result = Object.values(
-    agentData.reduce((acc, obj) => {
-      const { name, calls, averageCalltime, dnd, pause, transfers } = obj;
+  const result = useMemo(() => {
+    return Object.values(
+      agentData.reduce((acc, obj) => {
+        const { name, calls, averageCalltime, dnd, pause, transfers } = obj;
 
-      if (acc[name]) {
-        acc[name].calls += calls;
-        acc[name].transfers += transfers;
-      } else {
-        acc[name] = { name, calls, averageCalltime, dnd, pause, transfers };
-      }
-      return acc;
-    }, {})
-  );
+        if (acc[name]) {
+          acc[name].calls += calls;
+          acc[name].transfers += transfers;
+        } else {
+          acc[name] = { name, calls, averageCalltime, dnd, pause, transfers };
+        }
+        return acc;
+      }, {})
+    );
+  }, [agentData]);
 
-  const handleDisableButton = () => {
-    if (dateFrom === "" || dateTo === "") {
-      return true;
-    } else if (dateFrom > dateTo) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-  console.log(handleDisableButton());
+  const handleDisableButton = () => !dateFrom || !dateTo || dateFrom > dateTo;
+
+  const fields = [
+    {
+      id: "companyid",
+      label: "Kundenummer",
+      type: "number",
+      value: companyId,
+      onChange: setCompanyId,
+    },
+    {
+      id: "datefrom",
+      type: "date",
+      value: dateFrom,
+      onChange: setDateFrom,
+    },
+    {
+      id: "dateto",
+      type: "date",
+      value: dateTo,
+      onChange: setDateTo,
+    },
+    {
+      id: "queueNumber",
+      label: "Kønummer",
+      type: "number",
+      value: queueNumber,
+      onChange: setQueueNumber,
+    },
+  ];
+
+  const sortedFilteredResult = useMemo(() => 
+    result
+        .filter(item => item.calls !== 0)
+        .sort((a, b) => b.calls - a.calls),
+    [result]
+);
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
         <Box display={"flex"} justifyContent={"center"} marginBottom={0}>
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
-              <TextField
-                onChange={(e) => setCompanyId(e.target.value)}
-                id="companyid"
-                type="number"
-                variant="filled"
-                size="small"
-                label="Kundenummer"
-                color="success"
-                value={companyId}
-                sx={{ marginRight: 1 }}
-              />
-
-              <TextField
-                onChange={(e) => setDateFrom(e.target.value)}
-                id="datefrom"
-                size="small"
-                variant="filled"
-                type="date"
-                label="Fra"
-                color="success"
-                value={dateFrom}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                sx={{ marginRight: 1 }}
-              />
-              <TextField
-                onChange={(e) => setDateTo(e.target.value)}
-                id="dateto"
-                variant="filled"
-                type="date"
-                label="Til"
-                size="small"
-                color="success"
-                value={dateTo}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                sx={{ marginRight: 1 }}
-              />
-              <TextField
-                onChange={(e) => setQueueNumber(e.target.value)}
-                id="queueNumber"
-                type="number"
-                variant="filled"
-                size="small"
-                label="Kønummer"
-                color="success"
-                value={queueNumber}
-                sx={{ marginRight: 1 }}
-              />
+              {fields.map((field) => (
+                <TextField
+                  key={field.id}
+                  id={field.id}
+                  type={field.type}
+                  label={field.label}
+                  variant="filled"
+                  size="small"
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  sx={{ marginRight: 1 }}
+                />
+              ))}
               <LoadingButton
                 type="submit"
                 variant="contained"
@@ -249,7 +233,6 @@ function App() {
                     <TableRow>
                       <TableCell>Navn</TableCell>
                       <TableCell>Besvaret</TableCell>
-                      {/* <TableCell>Gns. Samtaletid</TableCell> */}
                       <Tooltip
                         title="Gælder kun for ledsaget omstilling!"
                         followCursor
@@ -257,24 +240,23 @@ function App() {
                         <TableCell>Omstillet*</TableCell>
                       </Tooltip>
                       <TableCell>Behandlet</TableCell>
+                      <TableCell>Gns. Samtaletid</TableCell>
                       <TableCell>DND</TableCell>
                       <TableCell>Pause</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {result
-
-                      .sort((a, b) => b.calls - a.calls)
-                      .filter((item) => item.calls !== 0)
+                    {sortedFilteredResult
                       .map((item, i) => (
                         <TableRow key={i}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.calls}</TableCell>
-                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
+                          
                           <TableCell>
                             {item.transfers !== null ? item.transfers : 0}
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
+                          <TableCell>{item.averageCalltime}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
                           <TableCell>{item.pause}</TableCell>
                         </TableRow>

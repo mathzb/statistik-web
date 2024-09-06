@@ -6,20 +6,40 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
+import { useMemo } from "react";
 
-const TableComponent = (props) => {
+const TableComponent = ({ caption, periodData }) => {
+  const filteredSortedData = useMemo(() => {
+    return periodData
+      .filter((item) => item.queueExtension <= 1530)
+      .sort((a, b) => b.calls - a.calls);
+  }, [periodData]);
+
+  const renderRows = filteredSortedData.map((item, i) => (
+    <TableRow key={i}>
+      <TableCell>{item.queueName}</TableCell>
+      <TableCell>{item.calls}</TableCell>
+      <TableCell>{item.answeredCalls || "0"}</TableCell>
+      <TableCell>{item.transfers || 0}</TableCell>
+      <TableCell>{item.averageCalltime || "00:00:00"}</TableCell>
+      <TableCell>{item.averageHoldtime || "00:00:00"}</TableCell>
+      <TableCell>{item.abandoned || "0"}</TableCell>
+      <TableCell>{item.serviceLevel ? `${item.serviceLevel}%` : "0%"}</TableCell>
+    </TableRow>
+  ));
+
   return (
     <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
       <Table stickyHeader>
         <caption>
-          <strong>{props.caption}</strong>
+          <strong>{caption}</strong>
         </caption>
         <TableHead>
           <TableRow>
             <TableCell>Kønavn</TableCell>
             <TableCell>Opkald</TableCell>
             <TableCell>Besvaret</TableCell>
-            <Tooltip title={props.caption} followCursor>
+            <Tooltip title={caption} followCursor>
               <TableCell>Omstillet*</TableCell>
             </Tooltip>
             <TableCell>Gns. Samtaletid</TableCell>
@@ -29,38 +49,7 @@ const TableComponent = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.periodData
-            .filter((item) => item.queueExtension <= 1530)
-            .sort((a, b) => b.calls - a.calls)
-            .map((item, i) => (
-              <TableRow key={i}>
-                <TableCell>{item.queueName}</TableCell>
-                <TableCell>{item.calls}</TableCell>
-                <TableCell>
-                  {item.answeredCalls !== null ? item.answeredCalls : "0"}
-                </TableCell>
-                <TableCell>
-                  {item.transfers !== null ? item.transfers : 0}
-                </TableCell>
-                <TableCell>
-                  {item.averageCalltime !== null
-                    ? item.averageCalltime
-                    : "00:00:00"}
-                </TableCell>
-                <TableCell>
-                  {item.averageHoldtime !== null
-                    ? item.averageHoldtime
-                    : "00:00:00"}
-                </TableCell>
-                <TableCell>
-                  {item.abandoned !== null ? item.abandoned : "0"}
-                </TableCell>
-                <TableCell>
-                  {item.serviceLevel}
-                  {item.serviceLevel === null ? "0%" : "%"}
-                </TableCell>
-              </TableRow>
-            ))}
+          {renderRows}
         </TableBody>
       </Table>
     </TableContainer>
