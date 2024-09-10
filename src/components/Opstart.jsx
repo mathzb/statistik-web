@@ -18,8 +18,9 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfersAndPause } from "../utils";
+import { addDayToDate, calculateCallsTransfersAndPause } from "../utils";
 import Navbar from "./Navbar";
+import { fetchApiData } from "../api";
 
 const Skade = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -82,33 +83,25 @@ const Skade = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.defaults.headers.common = {
-      Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-    };
-
+   
     if (dateTo) {
-      // Add one day to the input date
-      const inputDateObj = new Date(dateTo);
-      inputDateObj.setDate(inputDateObj.getDate() + 1);
-
-      // Format the date to 'yyyy-mm-dd' format
-      const formattedDate = inputDateObj.toISOString().split("T")[0];
+      const formattedDate = addDayToDate(dateTo)
 
       try {
         setIsLoading(true);
-        const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
+        const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
+          dateFrom,
+          dateTo: formattedDate
+        })
 
-        const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
+       const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
+        dateFrom,
+        dateTo: formattedDate
+       })
 
         setIsLoading(false);
-        const resPeriod = fetchPeriod.data;
-        const resAgent = fetchAgent.data;
-        setPeriodData(resPeriod.data);
-        setAgentData(resAgent.data);
+        setPeriodData(periodData.data);
+        setAgentData(agentData.data);
         setIsError(false);
         // console.log(resAgent.data);
         // console.log(resPeriod.data);
@@ -227,8 +220,6 @@ const Skade = () => {
                     </Tooltip>
                     <TableCell>Udløb</TableCell>
                     <TableCell>Lagt på</TableCell>
-                    <TableCell>Udløb ved 0. agenter</TableCell>
-                    <TableCell>Maks ventetid</TableCell>
                     <TableCell>Gns. Samtaletid</TableCell>
                     <TableCell>Gns. Ventetid</TableCell>
                     <TableCell>Servicelevel</TableCell>
@@ -236,7 +227,7 @@ const Skade = () => {
                 </TableHead>
                 <TableBody>
                   {periodData
-                    .filter((item) => item.queueExtension === 1530)
+                    .filter((item) => item.queueExtension === 1500)
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
@@ -250,20 +241,11 @@ const Skade = () => {
                         <TableCell>
                           {item.transfers !== null ? item.transfers : 0}
                         </TableCell>
-
                         <TableCell>
                           {item.timeOut !== null ? item.timeOut : "0"}
                         </TableCell>
                         <TableCell>
                           {item.abandoned !== null ? item.abandoned : "0"}
-                        </TableCell>
-                        <TableCell>
-                          {item.exitempty !== null ? item.exitempty : "0"}
-                        </TableCell>
-                        <TableCell>
-                          {item.maxHoldtime !== null
-                            ? item.maxHoldtime
-                            : "00:00:00"}
                         </TableCell>
                         <TableCell>
                           {item.averageCalltime !== null
@@ -311,6 +293,7 @@ const Skade = () => {
                         <TableCell>Omstillet*</TableCell>
                       </Tooltip>
                       <TableCell>Behandlet</TableCell>
+                      <TableCell>Gns. Samtaletid</TableCell>
                       <TableCell>DND Tid</TableCell>
                       <TableCell>Pause Tid</TableCell>
                     </TableRow>
@@ -322,11 +305,11 @@ const Skade = () => {
                         <StyledTableRow key={i}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.calls}</TableCell>
-                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
                           <TableCell>
                             {item.transfers !== null ? item.transfers : 0}
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
+                          <TableCell>{item.averageCalltime}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
                           <TableCell>
                             {item.pause !== null ? item.pause : "00:00:00"}

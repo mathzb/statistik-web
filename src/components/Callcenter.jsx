@@ -18,8 +18,9 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfersAndPause } from "../utils";
+import { addDayToDate, calculateCallsTransfersAndPause, handleDisableButton } from "../utils";
 import Navbar from "./Navbar";
+import { fetchApiData } from "../api";
 
 const Callcenter = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -81,52 +82,32 @@ const Callcenter = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.defaults.headers.common = {
-      Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-    };
 
     if (dateTo) {
-      // Add one day to the input date
-      const inputDateObj = new Date(dateTo);
-      inputDateObj.setDate(inputDateObj.getDate() + 1);
-
-      // Format the date to 'yyyy-mm-dd' format
-      const formattedDate = inputDateObj.toISOString().split("T")[0];
+     const formattedDate = addDayToDate(dateTo)
 
       try {
         setIsLoading(true);
-        const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
+        const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
+          dateFrom,
+          dateTo: formattedDate
+        })
 
-        const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
+        const agentData = await fetchApiData(`/QueueReports/2776/AgentByday`, {
+          dateFrom,
+          dateTo: formattedDate
+        })
 
         setIsLoading(false);
-        const resPeriod = fetchPeriod.data;
-        const resAgent = fetchAgent.data;
-        setPeriodData(resPeriod.data);
-        setAgentData(resAgent.data);
+        setPeriodData(periodData.data);
+        setAgentData(agentData.data);
         setIsError(false);
-        // console.log(resAgent.data);
-        // console.log(resPeriod.data);
       } catch (error) {
         console.log(error);
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
       }
-    }
-  };
-
-  const handleDisableButton = () => {
-    if (dateFrom === "" || dateTo === "") {
-      return true;
-    } else if (dateFrom > dateTo) {
-      return true;
-    } else {
-      return false;
     }
   };
 
@@ -180,7 +161,7 @@ const Callcenter = () => {
                 loading={isLoading}
                 color="success"
                 size="medium"
-                disabled={handleDisableButton()}
+                disabled={handleDisableButton(dateFrom, dateTo)}
                 sx={{ margin: 0.7 }}
               >
                 Søg

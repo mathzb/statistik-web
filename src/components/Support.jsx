@@ -1,4 +1,3 @@
-import axios from "axios";
 import TextField from "@mui/material/TextField";
 import SendIcon from "@mui/icons-material/Send";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -18,8 +17,13 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { calculateCallsTransfersAndPause, checkDateDifference } from "../utils";
+import { addDayToDate, calculateCallsTransfersAndPause, checkDateDifference, handleDisableButton } from "../utils";
 import Navbar from "./Navbar";
+import { fetchApiData } from "../api";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
 
 const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -81,54 +85,33 @@ const Support = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.defaults.headers.common = {
-      Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-    };
-
-    if (dateTo) {
-      // Add one day to the input date
-      const inputDateObj = new Date(dateTo);
-      inputDateObj.setDate(inputDateObj.getDate() + 1);
-
-      // Format the date to 'yyyy-mm-dd' format
-      const formattedDate = inputDateObj.toISOString().split("T")[0];
-
+  
+    if (dateTo) {  
+      const formattedDate = addDayToDate(dateTo)
+  
       try {
         setIsLoading(true);
-        const fetchPeriod = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/Period?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
-
-        const fetchAgent = await axios.get(
-          `https://api.ipnordic.dk/statistics/v1/QueueReports/2776/AgentByDay?dateFrom=${dateFrom}&dateTo=${formattedDate}`
-        );
-
+  
+        const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
+          dateFrom,
+          dateTo: formattedDate,
+        });
+  
+        const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
+          dateFrom,
+          dateTo: formattedDate,
+        });
+  
         setIsLoading(false);
-        const resPeriod = fetchPeriod.data;
-        const resAgent = fetchAgent.data;
-        setPeriodData(resPeriod.data);
-        setAgentData(resAgent.data);
+        setPeriodData(periodData.data);
+        setAgentData(agentData.data);
         setIsError(false);
-        // console.log(resAgent.data);
-        // console.log(resPeriod.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
       }
-    }
-  };
-
-  const handleDisableButton = () => {
-    if (dateFrom === "" || dateTo === "") {
-      return true;
-    } else if (dateFrom > dateTo) {
-      return true;
-    } else if (checkDateDifference(dateFrom, dateTo)) {
-      return true;
-    } else {
-      return false
     }
   };
 
@@ -183,7 +166,7 @@ const Support = () => {
                 loading={isLoading}
                 color="success"
                 size="medium"
-                disabled={handleDisableButton()}
+                disabled={handleDisableButton(dateFrom, dateTo)}
                 sx={{ margin: 0.7 }}
               >
                 Søg
@@ -309,6 +292,7 @@ const Support = () => {
                         <TableCell>Omstillet*</TableCell>
                       </Tooltip>
                       <TableCell>Behandlet</TableCell>
+                      <TableCell>Gns. Samtaletid</TableCell>
                       <TableCell>DND Tid</TableCell>
                       <TableCell>Pause Tid</TableCell>
                     </TableRow>
@@ -320,11 +304,11 @@ const Support = () => {
                         <StyledTableRow key={i}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.calls}</TableCell>
-                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
                           <TableCell>
                             {item.transfers !== null ? item.transfers : 0}
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
+                          <TableCell>{item.averageCalltime}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
                           <TableCell>
                             {item.pause !== null ? item.pause : "00:00:00"}
