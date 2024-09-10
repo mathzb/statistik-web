@@ -139,3 +139,11 @@ export function checkDateDifference(dateFrom, dateTo) {
     return false; // Otherwise, return false
   }
 }
+
+export const addDayToDate = (date) => {
+  const dateObj = new Date(date);
+  dateObj.setDate(dateObj.getDate() + 1);
+  return dateObj.toISOString().split("T")[0];
+};
+
+export const handleDisableButton = (dateFrom, dateTo) => dateFrom === ""  || dateTo === "" ? true : dateFrom > dateTo ? true : checkDateDifference(dateFrom, dateTo) ? true : false
