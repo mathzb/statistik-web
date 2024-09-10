@@ -103,24 +103,12 @@ const Skade = () => {
         setPeriodData(periodData.data);
         setAgentData(agentData.data);
         setIsError(false);
-        // console.log(resAgent.data);
-        // console.log(resPeriod.data);
       } catch (error) {
         console.log(error);
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
       }
-    }
-  };
-
-  const handleDisableButton = () => {
-    if (dateFrom === "" || dateTo === "") {
-      return true;
-    } else if (dateFrom > dateTo) {
-      return true;
-    } else {
-      return false;
     }
   };
 
@@ -136,6 +124,7 @@ const Skade = () => {
               handleClose={handleClose}
             />
           </Box>
+          
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
@@ -174,7 +163,7 @@ const Skade = () => {
                 loading={isLoading}
                 color="success"
                 size="medium"
-                disabled={handleDisableButton()}
+                disabled={handleDisableButton(dateFrom, dateTo)}
                 sx={{ margin: 0.7 }}
               >
                 Søg
@@ -182,6 +171,13 @@ const Skade = () => {
             </form>
           </Box>
         </Box>
+        {checkDateDifference(dateFrom, dateTo) ? (
+          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
+          <Alert severity="error" sx={{ margin: 2 }}>
+          Det er ikke tilladt at vælge en dato på mere end 2 år.
+          </Alert>
+        </Box>
+        ) : ''}
         {isError ? (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
             <Alert severity="error" sx={{ margin: 2 }}>
@@ -227,7 +223,7 @@ const Skade = () => {
                 </TableHead>
                 <TableBody>
                   {periodData
-                    .filter((item) => item.queueExtension === 1500)
+                    .filter((item) => item.queueExtension === 1530)
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>

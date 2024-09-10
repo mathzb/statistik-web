@@ -20,9 +20,6 @@ import { styled } from "@mui/material/styles";
 import { addDayToDate, calculateCallsTransfersAndPause, checkDateDifference, handleDisableButton } from "../utils";
 import Navbar from "./Navbar";
 import { fetchApiData } from "../api";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 const Support = () => {

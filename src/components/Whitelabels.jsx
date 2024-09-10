@@ -124,6 +124,7 @@ const Support = () => {
               handleClose={handleClose}
             />
           </Box>
+          
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
@@ -170,6 +171,13 @@ const Support = () => {
             </form>
           </Box>
         </Box>
+        {checkDateDifference(dateFrom, dateTo) ? (
+          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
+          <Alert severity="error" sx={{ margin: 2 }}>
+          Det er ikke tilladt at vælge en dato på mere end 2 år.
+          </Alert>
+        </Box>
+        ) : ''}
         {isError ? (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
             <Alert severity="error" sx={{ margin: 2 }}>
@@ -290,6 +298,7 @@ const Support = () => {
                         <TableCell>Omstillet*</TableCell>
                       </Tooltip>
                       <TableCell>Behandlet</TableCell>
+                      <TableCell>Gns. Samtaletid</TableCell>
                       <TableCell>DND Tid</TableCell>
                       <TableCell>Pause Tid</TableCell>
                     </TableRow>
@@ -308,11 +317,11 @@ const Support = () => {
                         <StyledTableRow key={i}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.calls}</TableCell>
-                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
                           <TableCell>
                             {item.transfers !== null ? item.transfers : 0}
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
+                          <TableCell>{item.averageCalltime}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
                           <TableCell>
                             {item.pause !== null ? item.pause : "00:00:00"}

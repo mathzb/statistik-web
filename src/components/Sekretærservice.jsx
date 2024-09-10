@@ -121,7 +121,7 @@ const Sekretærservice = () => {
               handleClose={handleClose}
             />
           </Box>
-         
+          
           <Box mt={2}>
             <form onSubmit={handleSubmit}>
               <TextField
@@ -168,6 +168,13 @@ const Sekretærservice = () => {
             </form>
           </Box>
         </Box>
+        {checkDateDifference(dateFrom, dateTo) ? (
+          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
+          <Alert severity="error" sx={{ margin: 2 }}>
+          Det er ikke tilladt at vælge en dato på mere end 2 år.
+          </Alert>
+        </Box>
+        ) : ''}
         {isError ? (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
             <Alert severity="error" sx={{ margin: 2 }}>
@@ -189,7 +196,7 @@ const Sekretærservice = () => {
               component={Paper}
               elevation={3}
             >
-              <Box margin={1.5}>Kø Statistik - Sekretærservice</Box>
+              <Box margin={1.5}>Kø Statistik - {capitalizedPath}</Box>
             </Box>
             <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
               <Table stickyHeader>
@@ -264,7 +271,7 @@ const Sekretærservice = () => {
                 component={Paper}
                 elevation={3}
               >
-                <Box margin={1.5}>Agent Statistik - Sekretærservice</Box>
+                <Box margin={1.5}>Agent Statistik - {capitalizedPath}</Box>
               </Box>
               <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
                 <Table stickyHeader>
@@ -279,6 +286,7 @@ const Sekretærservice = () => {
                         <TableCell>Omstillet*</TableCell>
                       </Tooltip>
                       <TableCell>Behandlet</TableCell>
+                      <TableCell>Gns. Samtaletid</TableCell>
                       <TableCell>DND Tid</TableCell>
                       <TableCell>Pause Tid</TableCell>
                     </TableRow>
@@ -290,13 +298,15 @@ const Sekretærservice = () => {
                         <StyledTableRow key={i}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.calls}</TableCell>
-                          {/* <TableCell>{item.averageCalltime}</TableCell> */}
                           <TableCell>
                             {item.transfers !== null ? item.transfers : 0}
                           </TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
+                          <TableCell>{item.averageCalltime}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause}</TableCell>
+                          <TableCell>
+                            {item.pause !== null ? item.pause : "00:00:00"}
+                          </TableCell>
                         </StyledTableRow>
                       ))}
                   </TableBody>
