@@ -1,4 +1,3 @@
-import axios from "axios";
 import TextField from "@mui/material/TextField";
 import SendIcon from "@mui/icons-material/Send";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -18,11 +17,28 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import { addDayToDate, calculateCallsTransfersAndPause, checkDateDifference, handleDisableButton } from "../utils";
+import {
+  addDayToDate,
+  calculateCallsTransfersAndPause,
+  checkDateDifference,
+  handleDisableButton,
+} from "../utils";
 import Navbar from "./Navbar";
 import { fetchApiData } from "../api";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import "dayjs/locale/da"; // Use 'da' for Danish
 
-const Sekretærservice = () => {
+dayjs.locale("da");
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(localizedFormat);
+
+const Support = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -63,11 +79,9 @@ const Sekretærservice = () => {
   const {
     updateDateFrom: setDateFrom,
     updateDateTo: setDateTo,
-
     updateIsLoading: setIsLoading,
     updateIsError: setIsError,
     updateErrMsg: setErrMsg,
-
     updatePeriodData: setPeriodData,
     updateAgentData: setAgentData,
   } = useBookStore((state) => ({
@@ -84,24 +98,27 @@ const Sekretærservice = () => {
     e.preventDefault();
 
     if (dateTo) {
-      const formattedDate = addDayToDate(dateTo)
+      const formattedDate = addDayToDate(dateTo);
 
       try {
         setIsLoading(true);
-       const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
-        dateFrom,
-        dateTo: formattedDate
-       })
+
+        const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
+          dateFrom,
+          dateTo: formattedDate,
+        });
 
         const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
           dateFrom,
-          dateTo: formattedDate
-        })
+          dateTo: formattedDate,
+        });
+
         setIsLoading(false);
         setPeriodData(periodData.data);
         setAgentData(agentData.data);
         setIsError(false);
       } catch (error) {
+        console.error(error);
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
@@ -114,44 +131,33 @@ const Sekretærservice = () => {
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
         <Box display={"flex"} justifyContent={"space-between"} marginBottom={2}>
           <Box margin={2} paddingTop={2}>
-          <Navbar
+            <Navbar
               anchorEl={anchorEl}
               open={open}
               handleClick={handleClick}
               handleClose={handleClose}
             />
           </Box>
-          
-          <Box mt={2}>
+
+          <Box mt={2} display={"flex"} justifyContent={"center"} alignItems={"center"} width="40%">
             <form onSubmit={handleSubmit}>
-              <TextField
-                onChange={(e) => setDateFrom(e.target.value)}
-                id="datefrom"
-                size="small"
-                variant="filled"
-                type="date"
-                label="Fra"
-                color="success"
-                value={dateFrom}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                sx={{ marginRight: 1 }}
-              />
-              <TextField
-                onChange={(e) => setDateTo(e.target.value)}
-                id="dateto"
-                variant="filled"
-                type="date"
-                label="Til"
-                size="small"
-                color="success"
-                value={dateTo}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                sx={{ marginRight: 1 }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="da">
+                <DatePicker
+                  label="Fra"
+                  value={dateFrom ? dayjs(dateFrom) : null}
+                  onChange={(newValue) => setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)}
+                  inputFormat="DD-MM-YYYY"
+                  sx={{margin: 1}}
+                />
+                <DatePicker
+                  label="Til"
+                  value={dateTo ? dayjs(dateTo) : null}
+                  onChange={(newValue) => setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)}
+                  inputFormat="DD-MM-YYYY"
+                  sx={{margin: 1}}
+                  
+                />
+              </LocalizationProvider>
               <LoadingButton
                 type="submit"
                 variant="contained"
@@ -159,34 +165,33 @@ const Sekretærservice = () => {
                 loadingPosition="end"
                 loading={isLoading}
                 color="success"
-                size="medium"
+                size="large"
                 disabled={handleDisableButton(dateFrom, dateTo)}
-                sx={{ margin: 0.7 }}
+                sx={{ margin: 1.8 }}
               >
                 Søg
               </LoadingButton>
             </form>
           </Box>
         </Box>
-        {checkDateDifference(dateFrom, dateTo) ? (
+
+        {/* Error handling and table rendering */}
+        {checkDateDifference(dateFrom, dateTo) && (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
-          <Alert severity="error" sx={{ margin: 2 }}>
-          Det er ikke tilladt at vælge en dato på mere end 2 år.
-          </Alert>
-        </Box>
-        ) : ''}
-        {isError ? (
+            <Alert severity="error" sx={{ margin: 2 }}>
+              Det er ikke tilladt at vælge en dato på mere end 2 år.
+            </Alert>
+          </Box>
+        )}
+        {isError && (
           <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
             <Alert severity="error" sx={{ margin: 2 }}>
               {errMsg}
             </Alert>
           </Box>
-        ) : (
-          ""
         )}
         {periodData.length > 0 && (
           <Box>
-            {/* <Grid item md={6}> */}
             <Box
               display={"flex"}
               justifyContent={"space-evenly"}
@@ -200,9 +205,6 @@ const Sekretærservice = () => {
             </Box>
             <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
               <Table stickyHeader>
-                <caption>
-                  <strong>Gælder kun ledsaget omstilling!</strong>
-                </caption>
                 <TableHead>
                   <TableRow>
                     <TableCell>Kønavn</TableCell>
@@ -226,41 +228,18 @@ const Sekretærservice = () => {
                       <StyledTableRow key={i}>
                         <TableCell>{item.queueName}</TableCell>
                         <TableCell>{item.calls}</TableCell>
-                        <TableCell>
-                          {item.answeredCalls !== null
-                            ? item.answeredCalls
-                            : "0"}
-                        </TableCell>
-                        <TableCell>
-                          {item.transfers !== null ? item.transfers : 0}
-                        </TableCell>
-                        <TableCell>
-                          {item.timeOut !== null ? item.timeOut : "0"}
-                        </TableCell>
-                        <TableCell>
-                          {item.abandoned !== null ? item.abandoned : "0"}
-                        </TableCell>
-                        <TableCell>
-                          {item.averageCalltime !== null
-                            ? item.averageCalltime
-                            : "00:00:00"}
-                        </TableCell>
-                        <TableCell>
-                          {item.averageHoldtime !== null
-                            ? item.averageHoldtime
-                            : "00:00:00"}
-                        </TableCell>
-
-                        <TableCell>
-                          {item.serviceLevel}
-                          {item.serviceLevel === null ? "0%" : "%"}
-                        </TableCell>
+                        <TableCell>{item.answeredCalls || "0"}</TableCell>
+                        <TableCell>{item.transfers || 0}</TableCell>
+                        <TableCell>{item.timeOut || "0"}</TableCell>
+                        <TableCell>{item.abandoned || "0"}</TableCell>
+                        <TableCell>{item.averageCalltime || "00:00:00"}</TableCell>
+                        <TableCell>{item.averageHoldtime || "00:00:00"}</TableCell>
+                        <TableCell>{item.serviceLevel ? `${item.serviceLevel}%` : "0%"}</TableCell>
                       </StyledTableRow>
                     ))}
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* </Grid> */}
             <Grid item md={6}>
               <Box
                 display={"flex"}
@@ -275,9 +254,6 @@ const Sekretærservice = () => {
               </Box>
               <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
                 <Table stickyHeader>
-                  <caption>
-                    <strong>* Gælder kun for ledsaget omstilling!</strong>
-                  </caption>
                   <TableHead>
                     <TableRow>
                       <TableCell>Navn</TableCell>
@@ -298,15 +274,11 @@ const Sekretærservice = () => {
                         <StyledTableRow key={i}>
                           <TableCell>{item.name}</TableCell>
                           <TableCell>{item.calls}</TableCell>
-                          <TableCell>
-                            {item.transfers !== null ? item.transfers : 0}
-                          </TableCell>
+                          <TableCell>{item.transfers || 0}</TableCell>
                           <TableCell>{item.calls - item.transfers}</TableCell>
                           <TableCell>{item.averageCalltime}</TableCell>
                           <TableCell>{item.dnd}</TableCell>
-                          <TableCell>
-                            {item.pause !== null ? item.pause : "00:00:00"}
-                          </TableCell>
+                          <TableCell>{item.pause || "00:00:00"}</TableCell>
                         </StyledTableRow>
                       ))}
                   </TableBody>
@@ -320,4 +292,4 @@ const Sekretærservice = () => {
   );
 };
 
-export default Sekretærservice;
+export default Support;
