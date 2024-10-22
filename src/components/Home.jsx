@@ -19,7 +19,7 @@ function Home() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 880,
+    width: 930,
     bgcolor: "background.paper",
     border: `2px solid ${theme.palette.divider}`, // Using theme colors
     boxShadow: 24,
@@ -46,6 +46,14 @@ function Home() {
             <Button component={Link} to="/support">
               Support
             </Button>
+            <Button component={Link} to="/totalsupport">
+              Total Support
+            </Button>
+            <ButtonGroup
+            variant="contained"
+            aria-label="outlined primary button group"
+          >
+            </ButtonGroup>
             <Button component={Link} to="/opstart">
               Opstart
             </Button>
@@ -60,9 +68,6 @@ function Home() {
             </Button>
             <Button component={Link} to="/callcenter">
               Callcenter
-            </Button>
-            <Button component={Link} to="/totalsupport">
-              Total Support
             </Button>
           </ButtonGroup>
         </Box>

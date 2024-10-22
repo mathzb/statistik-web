@@ -34,6 +34,7 @@ import "dayjs/locale/da"; // Use 'da' for Danish
 dayjs.locale("da");
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import { Slide, Snackbar } from "@mui/material";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(localizedFormat);
@@ -46,6 +47,24 @@ const TotalSupport = () => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  function SlideTransition(props) {
+    return <Slide {...props} direction="up" />;
+  }
+
+  const [openAlert, setAlertOpen] = React.useState(false);
+
+  const handleAlertClick = () => {
+    setAlertOpen(true);
+  };
+
+  const handleAlertClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
   };
 
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -75,7 +94,7 @@ const TotalSupport = () => {
     errMsg: state.errMsg,
     periodData: state.periodData,
     agentData: state.agentData,
-    totalAgentData: state.totalAgentData
+    totalAgentData: state.totalAgentData,
   }));
 
   const {
@@ -86,7 +105,7 @@ const TotalSupport = () => {
     updateErrMsg: setErrMsg,
     updatePeriodData: setPeriodData,
     updateAgentData: setAgentData,
-    updateTotalAgentData: setTotalAgentData
+    updateTotalAgentData: setTotalAgentData,
   } = useBookStore((state) => ({
     updateDateFrom: state.updateDateFrom,
     updateDateTo: state.updateDateTo,
@@ -95,7 +114,7 @@ const TotalSupport = () => {
     updateErrMsg: state.updateErrMsg,
     updateAgentData: state.updateAgentData,
     updatePeriodData: state.updatePeriodData,
-    updateTotalAgentData: state.updateTotalAgentData
+    updateTotalAgentData: state.updateTotalAgentData,
   }));
 
   const handleSubmit = async (e) => {
@@ -113,14 +132,14 @@ const TotalSupport = () => {
         });
 
         const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
-            dateFrom,
-            dateTo: formattedDate,
-          });
-  
-          const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
-            dateFrom,
-            dateTo: formattedDate,
-          });
+          dateFrom,
+          dateTo: formattedDate,
+        });
+
+        const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
+          dateFrom,
+          dateTo: formattedDate,
+        });
 
         setIsLoading(false);
         setTotalAgentData(TotalAgentData.data);
@@ -132,10 +151,11 @@ const TotalSupport = () => {
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
+        setAlertOpen(true);
       }
     }
   };
-console.log(totalAgentData)
+  console.log(totalAgentData);
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -149,23 +169,35 @@ console.log(totalAgentData)
             />
           </Box>
 
-          <Box mt={2} display={"flex"} justifyContent={"center"} alignItems={"center"} width="40%">
+          <Box
+            mt={2}
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            width="40%"
+          >
             <form onSubmit={handleSubmit}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="da">
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="da"
+              >
                 <DatePicker
                   label="Fra"
                   value={dateFrom ? dayjs(dateFrom) : null}
-                  onChange={(newValue) => setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)}
+                  onChange={(newValue) =>
+                    setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)
+                  }
                   inputFormat="DD-MM-YYYY"
-                  sx={{margin: 1}}
+                  sx={{ margin: 1 }}
                 />
                 <DatePicker
                   label="Til"
                   value={dateTo ? dayjs(dateTo) : null}
-                  onChange={(newValue) => setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)}
+                  onChange={(newValue) =>
+                    setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)
+                  }
                   inputFormat="DD-MM-YYYY"
-                  sx={{margin: 1}}
-                  
+                  sx={{ margin: 1 }}
                 />
               </LocalizationProvider>
               <LoadingButton
@@ -194,11 +226,17 @@ console.log(totalAgentData)
           </Box>
         )}
         {isError && (
-          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
-            <Alert severity="error" sx={{ margin: 2 }}>
+          <Snackbar
+            open={openAlert}
+            autoHideDuration={6000}
+            onClose={handleAlertClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            TransitionComponent={SlideTransition}
+          >
+            <Alert onClose={handleAlertClose} severity="error" variant="filled">
               {errMsg}
             </Alert>
-          </Box>
+          </Snackbar>
         )}
         {totalAgentData.length > 0 && (
           <Box>
@@ -230,15 +268,21 @@ console.log(totalAgentData)
                 </TableHead>
                 <TableBody>
                   {totalAgentData
-                    .filter((item) => item.location === 'Support' | item.location === 'Kundeservice')
-                    .sort((a, b) => b.calls - a.calls)
+                    .filter(
+                      (item) =>
+                        (item.location === "Support") |
+                        (item.location === "Kundeservice")
+                    )
+                    // .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
                         <TableCell>{item.name}</TableCell>
                         {/* <TableCell>{item.calls}</TableCell> */}
                         <TableCell>{item.answeredIn || 0}</TableCell>
                         <TableCell>{item.answeredOut || 0}</TableCell>
-                        <TableCell>{item.answeredOut + item.answeredIn || 0}</TableCell>
+                        <TableCell>
+                          {item.answeredOut + item.answeredIn || 0}
+                        </TableCell>
                         {/* <TableCell>{item.callsIn}</TableCell>
                         <TableCell>{item.callsOut}</TableCell> */}
                         <TableCell>{item.dndTime || "00:00:00"}</TableCell>
@@ -250,40 +294,44 @@ console.log(totalAgentData)
             </TableContainer>
 
             <Box marginTop={5}>
-            <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Agent</TableCell>
+              <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Agent</TableCell>
 
-                    {/* <TableCell>Besvaret Indg.</TableCell>
+                      {/* <TableCell>Besvaret Indg.</TableCell>
                     <TableCell>Besvaret Udg.</TableCell> */}
-                    <TableCell>Opkald Indg.</TableCell>
-                    <TableCell>Opkald Udg.</TableCell>
-                    <TableCell>Total ind- og udg. Opkald</TableCell>
-                    {/* <TableCell>DND tid</TableCell>
+                      <TableCell>Opkald Indg.</TableCell>
+                      <TableCell>Opkald Udg.</TableCell>
+                      <TableCell>Total ind- og udg. Opkald</TableCell>
+                      {/* <TableCell>DND tid</TableCell>
                     <TableCell>Pause tid</TableCell> */}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {totalAgentData
-                    .filter((item) => item.location === 'Support' | item.location === 'Kundeservice')
-                    .sort((a, b) => b.calls - a.calls)
-                    .map((item, i) => (
-                      <StyledTableRow key={i}>
-                        <TableCell>{item.name}</TableCell>
-                        {/* <TableCell>{item.answeredIn}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {totalAgentData
+                      .filter(
+                        (item) =>
+                          (item.location === "Support") |
+                          (item.location === "Kundeservice")
+                      )
+                      .sort((a, b) => b.calls - a.calls)
+                      .map((item, i) => (
+                        <StyledTableRow key={i}>
+                          <TableCell>{item.name}</TableCell>
+                          {/* <TableCell>{item.answeredIn}</TableCell>
                         <TableCell>{item.answeredOut}</TableCell> */}
-                        <TableCell>{item.callsIn || 0}</TableCell>
-                        <TableCell>{item.callsOut || 0}</TableCell>
-                        <TableCell>{item.calls}</TableCell>
-                        {/* <TableCell>{item.dndTime || "00:00:00"}</TableCell>
+                          <TableCell>{item.callsIn || 0}</TableCell>
+                          <TableCell>{item.callsOut || 0}</TableCell>
+                          <TableCell>{item.calls}</TableCell>
+                          {/* <TableCell>{item.dndTime || "00:00:00"}</TableCell>
                         <TableCell>{item.pauseTime || "00:00:00"}</TableCell> */}
-                      </StyledTableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                        </StyledTableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Box>
           </Box>
         )}

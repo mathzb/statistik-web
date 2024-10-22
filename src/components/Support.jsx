@@ -34,6 +34,7 @@ import "dayjs/locale/da"; // Use 'da' for Danish
 dayjs.locale("da");
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import { Slide, Snackbar } from "@mui/material";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(localizedFormat);
@@ -46,6 +47,24 @@ const Support = () => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  function SlideTransition(props) {
+    return <Slide {...props} direction="up" />;
+  }
+
+  const [openAlert, setAlertOpen] = React.useState(false);
+
+  const handleAlertClick = () => {
+    setAlertOpen(true);
+  };
+
+  const handleAlertClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
   };
 
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -75,7 +94,7 @@ const Support = () => {
     errMsg: state.errMsg,
     periodData: state.periodData,
     agentData: state.agentData,
-    totalAgentData: state.totalAgentData
+    totalAgentData: state.totalAgentData,
   }));
 
   const {
@@ -86,7 +105,7 @@ const Support = () => {
     updateErrMsg: setErrMsg,
     updatePeriodData: setPeriodData,
     updateAgentData: setAgentData,
-    updateTotalAgentData: setTotalAgentData
+    updateTotalAgentData: setTotalAgentData,
   } = useBookStore((state) => ({
     updateDateFrom: state.updateDateFrom,
     updateDateTo: state.updateDateTo,
@@ -95,7 +114,7 @@ const Support = () => {
     updateErrMsg: state.updateErrMsg,
     updateAgentData: state.updateAgentData,
     updatePeriodData: state.updatePeriodData,
-    updateTotalAgentData: state.updateTotalAgentData
+    updateTotalAgentData: state.updateTotalAgentData,
   }));
 
   const handleSubmit = async (e) => {
@@ -125,13 +144,14 @@ const Support = () => {
         setIsLoading(false);
         setPeriodData(periodData.data);
         setAgentData(agentData.data);
-        setTotalAgentData(TotalAgentData.data)
+        setTotalAgentData(TotalAgentData.data);
         setIsError(false);
       } catch (error) {
         console.error(error);
         setIsLoading(false);
         setIsError(true);
         setErrMsg(error.message);
+        setAlertOpen(true);
       }
     }
   };
@@ -149,23 +169,35 @@ const Support = () => {
             />
           </Box>
 
-          <Box mt={2} display={"flex"} justifyContent={"center"} alignItems={"center"} width="40%">
+          <Box
+            mt={2}
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            width="40%"
+          >
             <form onSubmit={handleSubmit}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="da">
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="da"
+              >
                 <DatePicker
                   label="Fra"
                   value={dateFrom ? dayjs(dateFrom) : null}
-                  onChange={(newValue) => setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)}
+                  onChange={(newValue) =>
+                    setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)
+                  }
                   inputFormat="DD-MM-YYYY"
-                  sx={{margin: 1}}
+                  sx={{ margin: 1 }}
                 />
                 <DatePicker
                   label="Til"
                   value={dateTo ? dayjs(dateTo) : null}
-                  onChange={(newValue) => setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)}
+                  onChange={(newValue) =>
+                    setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)
+                  }
                   inputFormat="DD-MM-YYYY"
-                  sx={{margin: 1}}
-                  
+                  sx={{ margin: 1 }}
                 />
               </LocalizationProvider>
               <LoadingButton
@@ -194,11 +226,17 @@ const Support = () => {
           </Box>
         )}
         {isError && (
-          <Box display={"flex"} justifyContent={"center"} marginBottom={2}>
-            <Alert severity="error" sx={{ margin: 2 }}>
+          <Snackbar
+            open={openAlert}
+            autoHideDuration={6000}
+            onClose={handleAlertClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            TransitionComponent={SlideTransition}
+          >
+            <Alert onClose={handleAlertClose} severity="error" variant="filled">
               {errMsg}
             </Alert>
-          </Box>
+          </Snackbar>
         )}
         {periodData.length > 0 && (
           <Box>
@@ -242,9 +280,15 @@ const Support = () => {
                         <TableCell>{item.transfers || 0}</TableCell>
                         <TableCell>{item.timeOut || "0"}</TableCell>
                         <TableCell>{item.abandoned || "0"}</TableCell>
-                        <TableCell>{item.averageCalltime || "00:00:00"}</TableCell>
-                        <TableCell>{item.averageHoldtime || "00:00:00"}</TableCell>
-                        <TableCell>{item.serviceLevel ? `${item.serviceLevel}%` : "0%"}</TableCell>
+                        <TableCell>
+                          {item.averageCalltime || "00:00:00"}
+                        </TableCell>
+                        <TableCell>
+                          {item.averageHoldtime || "00:00:00"}
+                        </TableCell>
+                        <TableCell>
+                          {item.serviceLevel ? `${item.serviceLevel}%` : "0%"}
+                        </TableCell>
                       </StyledTableRow>
                     ))}
                 </TableBody>
@@ -278,7 +322,10 @@ const Support = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {calculateCallsTransfersAndPause(agentData, "ipnordic Support")
+                    {calculateCallsTransfersAndPause(
+                      agentData,
+                      "ipnordic Support"
+                    )
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
                         <StyledTableRow key={i}>
