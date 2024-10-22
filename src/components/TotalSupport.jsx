@@ -38,7 +38,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(customParseFormat);
 dayjs.extend(localizedFormat);
 
-const Support = () => {
+const TotalSupport = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -107,25 +107,25 @@ const Support = () => {
       try {
         setIsLoading(true);
 
-        const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
-          dateFrom,
-          dateTo: formattedDate,
-        });
-
-        const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
-          dateFrom,
-          dateTo: formattedDate,
-        });
-
         const TotalAgentData = await fetchApiDataCDR(`/2776/TotalAgentData`, {
           dateFrom,
           dateTo: formattedDate,
         });
 
+        const periodData = await fetchApiData(`/QueueReports/2776/Period`, {
+            dateFrom,
+            dateTo: formattedDate,
+          });
+  
+          const agentData = await fetchApiData(`/QueueReports/2776/AgentByDay`, {
+            dateFrom,
+            dateTo: formattedDate,
+          });
+
         setIsLoading(false);
+        setTotalAgentData(TotalAgentData.data);
         setPeriodData(periodData.data);
         setAgentData(agentData.data);
-        setTotalAgentData(TotalAgentData.data)
         setIsError(false);
       } catch (error) {
         console.error(error);
@@ -135,7 +135,7 @@ const Support = () => {
       }
     }
   };
-
+console.log(totalAgentData)
   return (
     <Box sx={{ width: "100%" }}>
       <Container maxWidth="xxl" sx={{ marginBottom: 2 }}>
@@ -149,35 +149,23 @@ const Support = () => {
             />
           </Box>
 
-          <Box
-            mt={2}
-            display={"flex"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            width="40%"
-          >
+          <Box mt={2} display={"flex"} justifyContent={"center"} alignItems={"center"} width="40%">
             <form onSubmit={handleSubmit}>
-              <LocalizationProvider
-                dateAdapter={AdapterDayjs}
-                adapterLocale="da"
-              >
+              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="da">
                 <DatePicker
                   label="Fra"
                   value={dateFrom ? dayjs(dateFrom) : null}
-                  onChange={(newValue) =>
-                    setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)
-                  }
+                  onChange={(newValue) => setDateFrom(newValue ? newValue.format("YYYY-MM-DD") : null)}
                   inputFormat="DD-MM-YYYY"
-                  sx={{ margin: 1 }}
+                  sx={{margin: 1}}
                 />
                 <DatePicker
                   label="Til"
                   value={dateTo ? dayjs(dateTo) : null}
-                  onChange={(newValue) =>
-                    setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)
-                  }
+                  onChange={(newValue) => setDateTo(newValue ? newValue.format("YYYY-MM-DD") : null)}
                   inputFormat="DD-MM-YYYY"
-                  sx={{ margin: 1 }}
+                  sx={{margin: 1}}
+                  
                 />
               </LocalizationProvider>
               <LoadingButton
@@ -212,7 +200,7 @@ const Support = () => {
             </Alert>
           </Box>
         )}
-        {periodData.length > 0 && (
+        {totalAgentData.length > 0 && (
           <Box>
             <Box
               display={"flex"}
@@ -223,104 +211,80 @@ const Support = () => {
               component={Paper}
               elevation={3}
             >
-              <Box margin={1.5}>Kø Statistik - {capitalizedPath}</Box>
+              <Box margin={1.5}>Statistik - Support</Box>
             </Box>
             <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Kønavn</TableCell>
-                    <TableCell>Opkald</TableCell>
-                    <TableCell>Besvaret</TableCell>
-                    <Tooltip title="Gælder kun ved ledsaget omstilling!">
-                      <TableCell>Omstillet*</TableCell>
-                    </Tooltip>
-                    <TableCell>Udløb</TableCell>
-                    <TableCell>Lagt på</TableCell>
-                    <TableCell>Gns. Samtaletid</TableCell>
-                    <TableCell>Gns. Ventetid</TableCell>
-                    <TableCell>Servicelevel</TableCell>
+                    <TableCell>Agent</TableCell>
+                    {/* <TableCell>Opkald</TableCell> */}
+                    <TableCell>Besvaret Indg.</TableCell>
+                    <TableCell>Besvaret Udg.</TableCell>
+                    <TableCell>Total</TableCell>
+                    {/* <TableCell>Opkald Indg.</TableCell>
+                    <TableCell>Opkald Udg.</TableCell> */}
+                    <TableCell>DND tid</TableCell>
+                    <TableCell>Pause tid</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {periodData
-                    .filter(
-                      (item) =>
-                        item.queueExtension === 1501 ||
-                        item.queueExtension === 1506
-                    )
+                  {totalAgentData
+                    .filter((item) => item.location === 'Support' | item.location === 'Kundeservice')
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
                       <StyledTableRow key={i}>
-                        <TableCell>{item.queueName}</TableCell>
-                        <TableCell>{item.calls}</TableCell>
-                        <TableCell>{item.answeredCalls || "0"}</TableCell>
-                        <TableCell>{item.transfers || 0}</TableCell>
-                        <TableCell>{item.timeOut || "0"}</TableCell>
-                        <TableCell>{item.abandoned || "0"}</TableCell>
-                        <TableCell>
-                          {item.averageCalltime || "00:00:00"}
-                        </TableCell>
-                        <TableCell>
-                          {item.averageHoldtime || "00:00:00"}
-                        </TableCell>
-                        <TableCell>
-                          {item.serviceLevel ? `${item.serviceLevel}%` : "0%"}
-                        </TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        {/* <TableCell>{item.calls}</TableCell> */}
+                        <TableCell>{item.answeredIn || 0}</TableCell>
+                        <TableCell>{item.answeredOut || 0}</TableCell>
+                        <TableCell>{item.answeredOut + item.answeredIn || 0}</TableCell>
+                        {/* <TableCell>{item.callsIn}</TableCell>
+                        <TableCell>{item.callsOut}</TableCell> */}
+                        <TableCell>{item.dndTime || "00:00:00"}</TableCell>
+                        <TableCell>{item.pauseTime || "00:00:00"}</TableCell>
                       </StyledTableRow>
                     ))}
                 </TableBody>
               </Table>
             </TableContainer>
-            <Grid item md={6}>
-              <Box
-                display={"flex"}
-                justifyContent={"space-evenly"}
-                marginTop={2}
-                marginBottom={2}
-                height={50}
-                component={Paper}
-                elevation={3}
-              >
-                <Box margin={1.5}>Agent Statistik - {capitalizedPath}</Box>
-              </Box>
-              <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
-                <Table stickyHeader>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Navn</TableCell>
-                      <TableCell>Besvaret</TableCell>
-                      <Tooltip title="Gælder kun ved ledsaget omstilling!">
-                        <TableCell>Omstillet*</TableCell>
-                      </Tooltip>
-                      <TableCell>Behandlet</TableCell>
-                      <TableCell>Gns. Samtaletid</TableCell>
-                      <TableCell>DND Tid</TableCell>
-                      <TableCell>Pause Tid</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {calculateCallsTransfersAndPause(
-                      agentData,
-                      "Enreach Kundeservice",
-                      "Enreach"
-                    )
-                      .sort((a, b) => b.calls - a.calls)
-                      .map((item, i) => (
-                        <StyledTableRow key={i}>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>{item.calls}</TableCell>
-                          <TableCell>{item.transfers || 0}</TableCell>
-                          <TableCell>{item.calls - item.transfers}</TableCell>
-                          <TableCell>{item.averageCalltime}</TableCell>
-                          <TableCell>{item.dnd}</TableCell>
-                          <TableCell>{item.pause || "00:00:00"}</TableCell>
-                        </StyledTableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
+
+            <Box marginTop={5}>
+            <TableContainer sx={{ boxShadow: 3 }} component={Paper}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Agent</TableCell>
+
+                    {/* <TableCell>Besvaret Indg.</TableCell>
+                    <TableCell>Besvaret Udg.</TableCell> */}
+                    <TableCell>Opkald Indg.</TableCell>
+                    <TableCell>Opkald Udg.</TableCell>
+                    <TableCell>Total ind- og udg. Opkald</TableCell>
+                    {/* <TableCell>DND tid</TableCell>
+                    <TableCell>Pause tid</TableCell> */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {totalAgentData
+                    .filter((item) => item.location === 'Support' | item.location === 'Kundeservice')
+                    .sort((a, b) => b.calls - a.calls)
+                    .map((item, i) => (
+                      <StyledTableRow key={i}>
+                        <TableCell>{item.name}</TableCell>
+                        {/* <TableCell>{item.answeredIn}</TableCell>
+                        <TableCell>{item.answeredOut}</TableCell> */}
+                        <TableCell>{item.callsIn || 0}</TableCell>
+                        <TableCell>{item.callsOut || 0}</TableCell>
+                        <TableCell>{item.calls}</TableCell>
+                        {/* <TableCell>{item.dndTime || "00:00:00"}</TableCell>
+                        <TableCell>{item.pauseTime || "00:00:00"}</TableCell> */}
+                      </StyledTableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            </Box>
           </Box>
         )}
       </Container>
@@ -328,4 +292,4 @@ const Support = () => {
   );
 };
 
-export default Support;
+export default TotalSupport;

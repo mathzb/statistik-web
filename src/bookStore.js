@@ -21,6 +21,8 @@ export const useBookStore = create( (set, get) => ({
     updatePeriodData: (newPeriodData) => set({periodData: newPeriodData}),
     agentData: [],
     updateAgentData: (newAgentData) => set({agentData: newAgentData}),
+    totalAgentData: [],
+    updateTotalAgentData: (newTotalAgentData) => set({totalAgentData: newTotalAgentData}),
     queueNumber: "",
     updateQueueNumber: (newQueueNumber) => set({queueNumber: newQueueNumber}),
     selectedEndpoints: [],

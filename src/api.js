@@ -15,3 +15,19 @@ export const fetchApiData = async (endpoint, params = {}) => {
     throw new Error(error.response?.data?.message || error.message);
   }
 };
+
+const apiClientCDR = axios.create({
+  baseURL: 'https://api.ipnordic.dk/statistics/CDR/',
+  headers: {
+    Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+  },
+});
+
+export const fetchApiDataCDR = async (endpoint, params = {}) => {
+  try {
+    const response = await apiClientCDR.get(endpoint, { params });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || error.message);
+  }
+};

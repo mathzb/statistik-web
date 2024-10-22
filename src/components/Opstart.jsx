@@ -24,7 +24,7 @@ import {
   handleDisableButton,
 } from "../utils";
 import Navbar from "./Navbar";
-import { fetchApiData } from "../api";
+import { fetchApiData, fetchApiDataCDR } from "../api";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -63,6 +63,7 @@ const Support = () => {
     dateTo,
     periodData,
     agentData,
+    totalAgentData,
     isLoading,
     isError,
     errMsg,
@@ -74,6 +75,7 @@ const Support = () => {
     errMsg: state.errMsg,
     periodData: state.periodData,
     agentData: state.agentData,
+    totalAgentData: state.totalAgentData
   }));
 
   const {
@@ -84,6 +86,7 @@ const Support = () => {
     updateErrMsg: setErrMsg,
     updatePeriodData: setPeriodData,
     updateAgentData: setAgentData,
+    updateTotalAgentData: setTotalAgentData
   } = useBookStore((state) => ({
     updateDateFrom: state.updateDateFrom,
     updateDateTo: state.updateDateTo,
@@ -92,6 +95,7 @@ const Support = () => {
     updateErrMsg: state.updateErrMsg,
     updateAgentData: state.updateAgentData,
     updatePeriodData: state.updatePeriodData,
+    updateTotalAgentData: state.updateTotalAgentData
   }));
 
   const handleSubmit = async (e) => {
@@ -113,9 +117,15 @@ const Support = () => {
           dateTo: formattedDate,
         });
 
+        const TotalAgentData = await fetchApiDataCDR(`/2776/TotalAgentData`, {
+          dateFrom,
+          dateTo: formattedDate,
+        });
+
         setIsLoading(false);
         setPeriodData(periodData.data);
         setAgentData(agentData.data);
+        setTotalAgentData(TotalAgentData.data)
         setIsError(false);
       } catch (error) {
         console.error(error);

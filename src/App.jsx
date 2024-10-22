@@ -6,6 +6,7 @@ import Sekretærservice from "./components/Sekretærservice.jsx";
 import Callcenter from "./components/Callcenter.jsx";
 import Whitelabels from "./components/Whitelabels.jsx";
 import Enreach from "./components/Enreach.jsx";
+import TotalSupport from "./components/TotalSupport.jsx";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Route path="/sekretærservice" element={<Sekretærservice />} />
         <Route path="/callcenter" element={<Callcenter />} />
         <Route path="/whitelabels" element={<Whitelabels />} />
+        <Route path="/totalsupport" element={<TotalSupport />} />
         <Route path="/" element={<Home />} />
       </Routes>
     </Router>

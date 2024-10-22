@@ -45,6 +45,9 @@ const Navbar = ({ anchorEl, open, handleClick, handleClose }) => {
         <MenuItem component={Link} to={"/callcenter"}>
           Callcenter
         </MenuItem>
+        <MenuItem component={Link} to={"/totalsupport"}>
+          Total Support
+        </MenuItem>
       </Menu>
     </>
   );
