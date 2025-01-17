@@ -273,7 +273,7 @@ const Support = () => {
                     .filter(
                       (item) =>
                         item.queueExtension === 1501 ||
-                        item.queueExtension === 1506
+                        item.queueExtension === 1506 || item.queueExtension === 15133
                     )
                     .sort((a, b) => b.calls - a.calls)
                     .map((item, i) => (
@@ -329,7 +329,8 @@ const Support = () => {
                     {calculateCallsTransfersAndPause(
                       agentData,
                       "Enreach Kundeservice",
-                      "Enreach"
+                      "Enreach",
+                      "KLC Support"
                     )
                       .sort((a, b) => b.calls - a.calls)
                       .map((item, i) => (
